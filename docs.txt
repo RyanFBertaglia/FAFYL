@@ -1,0 +1,1010 @@
+# Contexto do Projeto: FAFYL — Recomendador de Cursos
+## Visão geral
+FAFYL é um sistema de recomendação de cursos universitários baseado em perfil DISC do usuário. O usuário responde um quiz com perguntas de múltipla escolha; cada alternativa mapeia para uma dimensão DISC (D, I, S, C) com um peso. O sistema calcula o perfil DISC do usuário e usa produto escalar (dot product) contra os pesos DISC de cada curso, retornando uma lista ordenada por afinidade. O nome do projeto vem do mascote da aplicação, o Capelinho — um personagem visual que muda de aparência de acordo com o curso ou preferência do usuário, configurado manualmente pelo frontend.
+---
+## Stack
+- Backend: Java com Spring Boot, Spring Security (JWT), Spring Data JPA
+- Banco de dados: Relacional (schema abaixo), com campos JSON para listas e coordenadas
+- Autenticação: JWT sem refresh token; existe um endpoint dedicado que renova o token usando o próprio access token ainda válido
+---
+## Entidades e schema do banco
+### users
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | gerado automaticamente |
+| name | text | |
+| email | text | único |
+| password | text | |
+| coordinates | json | embutido via @Embeddable Coordinates(lat, lon) |
+| capelinho_id | int FK | referencia capelinho |
+### question (pergunta)
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | gerado automaticamente |
+| text | text | texto da pergunta |
+### alternative (alternativas)
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | gerado automaticamente |
+| text | text | texto da alternativa |
+| dimension | char | letra referente ao DISC (D, I, S, C) |
+| weight | double | grau de influência da resposta no peso do fator DISC |
+| question_id | int FK | referencia question |
+> Cada pergunta tem múltiplas alternativas (cascade). Ao responder, o peso da alternativa escolhida é somado ao perfil DISC do usuário naquela dimensão.
+### capelinho
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | |
+| name | text | nome do visual do mascote |
+| url | text | URL do asset visual |
+> O Capelinho é o mascote da aplicação. Cada visual representa um tema/curso. O usuário escolhe manualmente pelo frontend qual visual quer — não é atribuído automaticamente pelo algoritmo.
+### course (curso)
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | |
+| name | text | |
+| disc_weights | json | mapa de pesos DISC: {"D": double, "I": double, "S": double, "C": double} |
+| description | text | |
+| category | text | ['EXATAS', 'SAUDE', 'HUMANAS', 'CRIATIVAS', 'COMUNICACAO']|
+> disc_weights representa o perfil DISC ideal do curso. Valores entre 0.0 e 1.0. O matching é feito via produto escalar entre o perfil do usuário e os pesos do curso.
+### college (faculdade)
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | |
+| name | text | |
+| coordinates | json | lat/lon |
+| image | text |
+| description | text | |
+### course_imp (curso_implementado)
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | |
+| name | text | nome da implementação específica |
+| id_course | int FK | referencia course |
+| id_college | int FK | referencia college |
+| note | json | mapa livre de informações adicionais |
+| details | json | mapa chave valor com informações como: horário (matutino, vespertino, noturno), duração total do curso (em semestres) |
+| description | text | detalhes sobre o curso nessa faculdade |
+| fees | double | mensalidade (caso a faculdade seja privada, senão o campo é null) |
+| coordinates | json | localização física do campus |
+> CourseImp é a oferta concreta de um Course em uma College específica, com detalhes financeiros e geográficos próprios. Um Course pode ter múltiplos CourseImp em diferentes faculdades.
+### historico
+| campo | tipo | obs |
+|---|---|---|
+| id | int PK | |
+| id_user | int FK | referencia users |
+| course_id | int FK | referencia course |
+| accessed_at | date | data da recomendação |
+> O histórico registra qual curso foi recomendado ao usuário e quando.
+---
+## Relacionamentos
+```
+User        ||--o|  Capelinho     : "tem (mascote visual)"
+User        ||--o{  Historico     : "gera automaticamente"
+Course      ||--o{  CourseImp     : "implementado em"
+College     ||--o{  CourseImp     : "oferece"
+Question    ||--o{  Alternative   : "possui alternativas (cascade)"
+Historico   }o--||  Course        : "referencia o curso recomendado"
+```
+---
+## Fluxo de autenticação
+### Login — POST /auth/login
+1. Cliente envia { email, password }
+2. Controller busca o User por email no banco
+3. Valida senha
+4. Chama JwtService.generateToken(user) → JWT assinado
+5. Retorna { token }
+### Requisição autenticada
+- Todo endpoint protegido passa pelo filtro do Spring Security
+- O filtro chama JwtService.validateToken(jwt) → extrai claims
+- Se válido, injeta o userId no contexto de segurança
+### Renovação de token — POST /auth/renew
+1. Cliente envia o access token ainda válido no header
+2. Backend valida o token atual (deve estar válido — não aceita expirado)
+3. Gera um novo JWT com nova expiração
+4. Retorna { novoToken }
+> Não existe refresh token separado. A renovação usa o próprio access token enquanto ainda não expirou.
+---
+## Endpoint principal — GET /fafyl
+### Input (corpo da requisição)
+```json
+{
+  "discProfile": {
+    "D": 0.8,
+    "I": 0.3,
+    "S": 0.5,
+    "C": 0.2
+  }
+}
+```
+> O discProfile é calculado a partir das respostas do quiz. Cada alternativa escolhida contribui com seu weight para a dimensão correspondente. O userId é extraído do JWT no header.
+### Lógica do FafylService (pipeline em stream)
+```java
+stream<Course>
+  // 1. Scoring: produto escalar entre discProfile do quiz e disc_weights do Course
+  .map(course -> new Fafyl(course.dotProduct(quiz.getDiscProfile()), course))
+  // 2. Descarta cursos sem nenhum match (score <= 0)
+  .filter(fafyl -> fafyl.score() > 0)
+  // 3. Ordena do maior para o menor score
+  .sorted(Comparator.comparingDouble(Fafyl::score).reversed())
+  .toList()
+```
+*Course.dotProduct(Map<Character, Double> profile)**
+```java
+public double dotProduct(Map<Character, Double> profile) {
+    if (discWeights == null) return 0.0;
+    double score = 0.0;
+    for (Map.Entry<Character, Double> entry : discWeights.entrySet()) {
+        double profileValue = profile.getOrDefault(entry.getKey(), 0.0);
+        score += entry.getValue() * profileValue;
+    }
+    return score;
+}
+```
+Retorna o produto escalar entre o perfil DISC do usuário e os pesos DISC do curso.
+*Fafyl** é um DTO com { double score, Course course }.
+### Após o pipeline
+1. Salva o histórico automaticamente: { userId, course_id, accessed_at }
+2. Retorna 200 OK com List<Fafyl> ranqueada
+### Participantes do fluxo
+```
+Cliente → Controller → FafylService → CourseRepo (streamAll)
+                    ↘               ↘ HistoricoRepo (save)
+```
+---
+## Endpoint de inserção de perguntas — POST /data/questions
+### Input (corpo da requisição)
+```json
+[
+  {
+    "text": "Você prefere tomar a frente em situações de grupo?",
+    "alternatives": [
+      { "text": "Sempre, gosto de liderar", "dimension": "D", "weight": 1.0 },
+      { "text": "Às vezes, se necessário", "dimension": "D", "weight": 0.5 },
+      { "text": "Prefiro acompanhar", "dimension": "S", "weight": 0.8 },
+      { "text": "Evito a todo custo", "dimension": "C", "weight": 0.3 }
+    ]
+  }
+]
+```
+> As perguntas são persistidas com cascade — alternativas são salvas automaticamente junto com a pergunta.
+---
+## Fluxo do usuário (User Flow)
+
+### 1. Cadastro
+Usuário preenche nome, email, senha e CEP.
+```
+Usuário         Frontend                Backend
+  |                |                      |
+  |-- preenche --> |                      |
+  |   formulário   |                      |
+  |                |-- POST /auth/register -->|
+  |                |   { name, email,        |
+  |                |     password, locale }   |
+  |                |                      |-- valida email único
+  |                |                      |-- cria User (BCrypt)
+  |                |                      |-- gera JWT (30min)
+  |                |<---- 201 { token } ----|
+  |<-- redireciona --|                      |
+  |   para /home    |                      |
+```
+
+### 2. Login
+Usuário informa email e senha.
+```
+Usuário         Frontend                Backend
+  |                |                      |
+  |-- email/pass ->|                      |
+  |                |-- POST /auth/login ->|
+  |                |   { email, password } |
+  |                |                      |-- findByEmail
+  |                |                      |-- passwordEncoder.matches
+  |                |                      |-- gera JWT (30min)
+  |                |<---- 200 { token } ----|
+  |<-- redireciona --|                      |
+  |   para /home    |                      |
+```
+Requisições autenticadas usam `Authorization: Bearer <token>`.
+Renovação via `POST /auth/renew` com o access token ainda válido.
+
+### 3. Quiz DISC
+Usuário responde 12 perguntas; cada alternativa acumula peso em D/I/S/C.
+```
+Usuário         Frontend                    Backend
+  |                |                          |
+  |                |-- GET /data/questions -->|
+  |                |  (fallback: mock local)  |
+  |                |<--- 200 [Question] ------|
+  |                |                          |
+  |-- pergunta 1 ->|                          |
+  |   escolhe alt  |  acumula weight p/       |
+  |                |  dimensão (D/I/S/C)      |
+  |--    ...     ->|  ...                     |
+  |-- pergunta 12->|                          |
+  |   escolhe alt  |  discProfile =           |
+  |                |  { D: X, I: Y,           |
+  |                |    S: Z, C: W }          |
+```
+
+### 4. Recomendações
+Frontend envia perfil; backend retorna cursos ranqueados por compatibilidade.
+```
+Frontend (quiz/resultado)     Backend
+  |                              |
+  |-- GET /fafyl --------------->|
+  |   { discProfile }            |
+  |   + page, size               |
+  |                              |-- streamAll courses
+  |                              |-- p/ cada course:
+  |                              |   score = dotProduct(
+  |                              |     discProfile,
+  |                              |     course.discWeights)
+  |                              |-- filter score > 0
+  |                              |-- sort desc por score
+  |                              |-- paginate
+  |<--- 200 [{ score, course }]--|
+  |                              |-- [async] save historico
+  |                              |   { userId, courseId, now }
+```
+
+### 5. Filtrar faculdades por distância
+Usuário filtra ofertas por localização (Haversine + Geoapify).
+```
+Frontend                        Backend                 Geoapify API
+  |                               |                        |
+  |-- POST /fafyl/courses ------->|                        |
+  |   { courses: [ids],           |                        |
+  |     distance, location }      |                        |
+  |                               |-- Haversine SQL        |
+  |                               |   (margem 1.3×)        |
+  |                               |                        |
+  |                               |-- p/ cada candidato:   |
+  |                               |-- GET /routing ------->|
+  |                               |   (waypoints, drive)   |
+  |                               |<--- { distance } ------|
+  |                               |   (distância real)     |
+  |<--- 200 [CourseImpDTO] -------|                        |
+```
+
+### 6. Navegação por cursos/faculdades
+```
+Frontend                        Backend
+  |                               |
+  |-- GET /model/course --------->|
+  |<--- 200 [Course] -------------|
+  |                               |
+  |-- GET /college --------------->|
+  |<--- 200 [College] ------------|
+  |                               |
+  |-- GET /college/{id}/course -->|
+  |<--- 200 [CourseImp] ----------|
+  |                               |
+  |-- GET /college/{id}/course/{courseId} -->|
+  |<--- 200 CourseImp ----------------------|
+```
+
+### 7. Perfil e capelinho
+```
+Frontend                        Backend
+  |                               |
+  |-- GET /auth/me --------------->|
+  |<--- 200 UserDTO --------------|
+  |                               |
+  |-- PUT /auth/capelinho/{id} -->|
+  |<--- 200 UserDTO --------------|
+  |                               |
+  |-- POST /auth/coordinates ---->|
+  |   { lat, lon }               |
+  |<--- 200 UserDTO --------------|
+  |                               |
+  |-- GET /auth/history ---------->|
+  |<--- 200 [History] ------------|
+```
+
+### 8. Mapa (rota)
+```
+Frontend                    expo-location      Geoapify API
+  |                             |                  |
+  |-- requestPermission() ----->|                  |
+  |<-- { coords } --------------|                  |
+  |                             |                  |
+  |-- GET /v1/routing --------------------------->|
+  |   waypoints=user;dest, drive                  |
+  |<--- { distance, duration, polyline } ---------|
+  |                             |                  |
+  |-- renderiza rota no mapa    |                  |
+```
+---
+## Regras de negócio resumidas
+| regra | detalhe |
+|---|---|
+| Ranking por score descendente | Maior produto escalar DISC = melhor posição |
+| Score > 0 filtra após scoring | Cursos sem compatibilidade DISC não aparecem no resultado |
+| Histórico é snapshot imutável | Salvo automaticamente; registra o curso recomendado e a data |
+| Capelinho é cosmético | Não influencia nenhum cálculo; escolhido manualmente pelo usuário no frontend |
+| disc_weights: Mapa JSON com pesos D, I, S, C | Cada curso tem um perfil DISC ideal representado por pesos entre 0.0 e 1.0 |
+| Quiz DISC: Perguntas com alternativas mapeadas a dimensões | Cada alternativa tem dimension (D/I/S/C) e weight (0.0-1.0) |
+| Perfil do usuário: Soma dos weights das alternativas escolhidas | O discProfile é o acumulado dos pesos por dimensão |
+---
+## OpenAPI Specification
+```json
+{
+   "openapi":"3.1.0",
+   "info":{
+      "title":"OpenAPI definition",
+      "version":"v0"
+   },
+   "servers":[
+      {
+         "url":"https://recommend-1-0.onrender.com",
+         "description":"Generated server url"
+      }
+   ],
+   "paths":{
+      "/model/course":{
+         "get":{
+            "tags":["data-controller"],
+            "operationId":"findAll",
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/Course"}
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post":{
+            "tags":["data-controller"],
+            "operationId":"insertModelCourses",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "type":"array",
+                        "items":{"$ref":"#/components/schemas/CourseDTO"}
+                     }
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/Course"}
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/data/questions":{
+         "post":{
+            "tags":["data-controller"],
+            "operationId":"insertQuestions",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "type":"array",
+                        "items":{"$ref":"#/components/schemas/QuestionDTO"}
+                     }
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/Question"}
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/fafyl/courses":{
+         "post":{
+            "tags":["fafyl-controller"],
+            "operationId":"findAllCourses",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{"$ref":"#/components/schemas/CoursesRequest"}
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/CourseImpDTO"}
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/course":{
+         "get":{
+            "tags":["data-controller"],
+            "operationId":"findAllCourses_1",
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/CourseImp"}
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post":{
+            "tags":["data-controller"],
+            "operationId":"insertCourses",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "type":"array",
+                        "items":{"$ref":"#/components/schemas/CourseImpDTO"}
+                     }
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/CourseImp"}
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/college":{
+         "get":{
+            "tags":["data-controller"],
+            "operationId":"findAllColleges",
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/College"}
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post":{
+            "tags":["data-controller"],
+            "operationId":"insertColleges",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "type":"array",
+                        "items":{"$ref":"#/components/schemas/CollegeDTO"}
+                     }
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/College"}
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/college/{id}/image":{
+         "post":{
+            "tags":["data-controller"],
+            "operationId":"updateCollegeImage",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"integer","format":"int32"}
+               }
+            ],
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "type":"object",
+                        "properties":{
+                           "image":{"type":"string","format":"binary"}
+                        },
+                        "required":["image"]
+                     }
+                  }
+               }
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/College"}}
+                  }
+               }
+            }
+         }
+      },
+      "/college/{id}/course":{
+         "get":{
+            "tags":["data-controller"],
+            "operationId":"findCoursesByCollegeId",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"integer","format":"int32"}
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/CourseImp"}
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "post":{
+            "tags":["data-controller"],
+            "operationId":"addCourseImpToCollege",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"integer","format":"int32"}
+               }
+            ],
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{"$ref":"#/components/schemas/CourseImpDTO"}
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/CourseImp"}}
+                  }
+               }
+            }
+         }
+      },
+      "/auth/register":{
+         "post":{
+            "tags":["auth-controller"],
+            "operationId":"register",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{"$ref":"#/components/schemas/RegisterRequest"}
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/AuthResponse"}}
+                  }
+               }
+            }
+         }
+      },
+      "/auth/refresh":{
+         "post":{
+            "tags":["auth-controller"],
+            "operationId":"refresh",
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/AuthResponse"}}
+                  }
+               }
+            }
+         }
+      },
+      "/auth/login":{
+         "post":{
+            "tags":["auth-controller"],
+            "operationId":"login",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{"$ref":"#/components/schemas/LoginRequest"}
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/AuthResponse"}}
+                  }
+               }
+            }
+         }
+      },
+      "/auth/coordinates":{
+         "post":{
+            "tags":["auth-controller"],
+            "operationId":"addCoordinates",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{"$ref":"#/components/schemas/Coordinates"}
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/UserDTO"}}
+                  }
+               }
+            }
+         }
+      },
+      "/storage/{filename}":{
+         "get":{
+            "tags":["storage-controller"],
+            "operationId":"getImage",
+            "parameters":[
+               {
+                  "name":"filename",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"string"}
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{"type":"string","format":"byte"}
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/fafyl":{
+         "get":{
+            "tags":["fafyl-controller"],
+            "operationId":"findAllFafyl",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{"$ref":"#/components/schemas/Quiz"}
+                  }
+               },
+               "required":true
+            },
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{
+                        "schema":{
+                           "type":"array",
+                           "items":{"$ref":"#/components/schemas/Fafyl"}
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/college/{id}":{
+         "get":{
+            "tags":["data-controller"],
+            "operationId":"findOneCollege",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"integer","format":"int32"}
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/College"}}
+                  }
+               }
+            }
+         }
+      },
+      "/college/{id}/course/{courseId}":{
+         "get":{
+            "tags":["data-controller"],
+            "operationId":"findCourseByCollegeIdAndCourseId",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"integer","format":"int32"}
+               },
+               {
+                  "name":"courseId",
+                  "in":"path",
+                  "required":true,
+                  "schema":{"type":"integer","format":"int32"}
+               }
+            ],
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/CourseImp"}}
+                  }
+               }
+            }
+         }
+      },
+      "/auth/me":{
+         "get":{
+            "tags":["auth-controller"],
+            "operationId":"me",
+            "responses":{
+               "200":{
+                  "description":"OK",
+                  "content":{
+                     "*/*":{"schema":{"$ref":"#/components/schemas/UserDTO"}}
+                  }
+               }
+            }
+         }
+      }
+   },
+   "components":{
+      "schemas":{
+         "AlternativeDTO":{
+            "type":"object",
+            "properties":{
+               "text":{"type":"string"},
+               "dimension":{"type":"string"},
+               "weight":{"type":"number","format":"double"}
+            }
+         },
+         "QuestionDTO":{
+            "type":"object",
+            "properties":{
+               "text":{"type":"string"},
+               "alternatives":{
+                  "type":"array",
+                  "items":{"$ref":"#/components/schemas/AlternativeDTO"}
+               }
+            }
+         },
+         "Question":{
+            "type":"object",
+            "properties":{
+               "id":{"type":"integer","format":"int32"},
+               "text":{"type":"string"},
+               "alternatives":{
+                  "type":"array",
+                  "items":{"$ref":"#/components/schemas/Alternative"}
+               }
+            }
+         },
+         "Alternative":{
+            "type":"object",
+            "properties":{
+               "id":{"type":"integer","format":"int32"},
+               "text":{"type":"string"},
+               "dimension":{"type":"string"},
+               "weight":{"type":"number","format":"double"}
+            }
+         },
+         "CourseDTO":{
+            "type":"object",
+            "properties":{
+               "name":{"type":"string"},
+               "discWeights":{
+                  "type":"object",
+                  "additionalProperties":{"type":"number","format":"double"}
+               },
+               "description":{"type":"string"}
+            }
+         },
+         "Course":{
+            "type":"object",
+            "properties":{
+               "id":{"type":"integer","format":"int32"},
+               "name":{"type":"string"},
+               "discWeights":{
+                  "type":"object",
+                  "additionalProperties":{"type":"number","format":"double"}
+               },
+               "description":{"type":"string"}
+            }
+         },
+         "Coordinates":{
+            "type":"object",
+            "properties":{
+               "lat":{"type":"number","format":"double"},
+               "lon":{"type":"number","format":"double"}
+            }
+         },
+         "CoursesRequest":{
+            "type":"object",
+            "properties":{
+               "courses":{
+                  "type":"array",
+                  "items":{"type":"integer","format":"int32"}
+               },
+               "distance":{"type":"number","format":"double"},
+               "location":{"$ref":"#/components/schemas/Coordinates"}
+            }
+         },
+         "CourseImpDTO":{
+            "type":"object",
+            "properties":{
+               "name":{"type":"string"},
+               "courseId":{"type":"integer","format":"int32"},
+               "collegeId":{"type":"integer","format":"int32"},
+               "note":{"type":"object","additionalProperties":{}},
+               "details":{"type":"string"},
+               "fees":{"type":"number","format":"double"},
+               "locale":{"$ref":"#/components/schemas/Coordinates"}
+            }
+         },
+         "College":{
+            "type":"object",
+            "properties":{
+               "id":{"type":"integer","format":"int32"},
+               "name":{"type":"string"},
+               "courses":{
+                  "type":"array",
+                  "items":{"$ref":"#/components/schemas/CourseImp"}
+               },
+               "locale":{"$ref":"#/components/schemas/Coordinates"},
+               "description":{"type":"string"},
+               "image":{"type":"string"}
+            }
+         },
+         "CourseImp":{
+            "type":"object",
+            "properties":{
+               "id":{"type":"integer","format":"int32"},
+               "name":{"type":"string"},
+               "course":{"$ref":"#/components/schemas/Course"},
+               "college":{"$ref":"#/components/schemas/College"},
+               "note":{"type":"object","additionalProperties":{}},
+               "details":{"type":"string"},
+               "fees":{"type":"number","format":"double"},
+               "locale":{"$ref":"#/components/schemas/Coordinates"}
+            }
+         },
+         "CollegeDTO":{
+            "type":"object",
+            "properties":{
+               "name":{"type":"string"},
+               "description":{"type":"string"},
+               "locale":{"$ref":"#/components/schemas/Coordinates"},
+               "courses":{
+                  "type":"array",
+                  "items":{"$ref":"#/components/schemas/CourseImpDTO"}
+               },
+               "image":{"type":"string","format":"binary"}
+            }
+         },
+         "RegisterRequest":{
+            "type":"object",
+            "properties":{
+               "name":{"type":"string"},
+               "email":{"type":"string"},
+               "password":{"type":"string"},
+               "locale":{"$ref":"#/components/schemas/Coordinates"}
+            }
+         },
+         "AuthResponse":{
+            "type":"object",
+            "properties":{
+               "token":{"type":"string"}
+            }
+         },
+         "LoginRequest":{
+            "type":"object",
+            "properties":{
+               "email":{"type":"string"},
+               "password":{"type":"string"}
+            }
+         },
+         "UserDTO":{
+            "type":"object",
+            "properties":{
+               "name":{"type":"string"},
+               "email":{"type":"string"},
+               "locale":{"$ref":"#/components/schemas/Coordinates"},
+               "capelinho":{"type":"integer","format":"int32"}
+            }
+         },
+         "Quiz":{
+            "type":"object",
+            "properties":{
+               "discProfile":{
+                  "type":"object",
+                  "additionalProperties":{"type":"number","format":"double"}
+               }
+            }
+         },
+         "Fafyl":{
+            "type":"object",
+            "properties":{
+               "score":{"type":"number","format":"double"},
+               "course":{"$ref":"#/components/schemas/Course"}
+            }
+         }
+      }
+   }
+}

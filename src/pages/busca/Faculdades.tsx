@@ -1,0 +1,224 @@
+import Background from '@/components/layout/background';
+import { IoSearch, IoFilter } from 'react-icons/io5';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { College, CollegeFilters } from '@/types';
+import { getAllColleges, getCollegesFiltered, getCollegeCourses } from '@/services/collegeService';
+import FaculdadesSkeleton from '@/components/skeletons/FaculdadesSkeleton';
+import { resolveImageUrl } from '@/utils/imageResolver';
+import { Input } from '@/components/ui/input';
+import { Card, CardContent } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import PageTransition from '@/components/layout/PageTransition';
+import FilterBar from '@/components/filter/FilterBar';
+import Pagination from '@/components/filter/Pagination';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.06 } },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
+};
+
+export default function FaculdadesScreen() {
+  const [searchParams] = useSearchParams();
+  const courseId = searchParams.get('courseId');
+  const navigate = useNavigate();
+  const [colleges, setColleges] = useState<College[]>([]);
+  const [filtered, setFiltered] = useState<College[]>([]);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+
+  const [maxDistance, setMaxDistance] = useState(0);
+  const [sortBy, setSortBy] = useState('name');
+  const [direction, setDirection] = useState<'asc' | 'desc'>('asc');
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [userLat, setUserLat] = useState<number | undefined>();
+  const [userLon, setUserLon] = useState<number | undefined>();
+
+  useEffect(() => {
+    getAllColleges().then(async (data) => {
+      let filteredColleges = data;
+      if (courseId) {
+        const id = parseInt(courseId, 10);
+        const withCourse: College[] = [];
+        for (const college of data) {
+          const imps = await getCollegeCourses(college.id);
+          if (imps.some((imp) => imp.course.id === id)) {
+            withCourse.push(college);
+          }
+        }
+        filteredColleges = withCourse;
+      }
+      setColleges(filteredColleges);
+      setFiltered(filteredColleges);
+      setLoading(false);
+    });
+  }, [courseId]);
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => { setUserLat(pos.coords.latitude); setUserLon(pos.coords.longitude); },
+        () => {}
+      );
+    }
+  }, []);
+
+  const fetchFiltered = useCallback(async (filters: CollegeFilters) => {
+    setLoading(true);
+    const res = await getCollegesFiltered(filters);
+    setFiltered(res.content);
+    setTotalPages(res.totalPages);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
+    if (maxDistance > 0 && userLat && userLon) {
+      fetchFiltered({
+        lat: userLat, lon: userLon, maxDistance,
+        sortBy, direction, page, size: 20,
+      });
+    } else if (maxDistance > 0 && !userLat) {
+      setFiltered([]);
+    } else {
+      setPage(0);
+    }
+  }, [maxDistance, sortBy, direction, page, userLat, userLon, fetchFiltered]);
+
+  useEffect(() => {
+    if (search.trim() === '') {
+      if (!maxDistance) setFiltered(colleges);
+    } else {
+      const q = search.toLowerCase();
+      setFiltered(
+        (maxDistance ? filtered : colleges).filter(
+          (c) =>
+            c.name.toLowerCase().includes(q) ||
+            c.description.toLowerCase().includes(q)
+        )
+      );
+    }
+  }, [search, colleges]);
+
+  const handleSortChange = (by: string, dir: 'asc' | 'desc') => {
+    setSortBy(by);
+    setDirection(dir);
+    setPage(0);
+  };
+
+  const displayList = maxDistance > 0 ? filtered : (
+    search.trim() === '' ? colleges : filtered
+  );
+
+  const renderCard = (item: College) => (
+    <motion.div key={item.id} variants={itemVariants}>
+      <Card className="overflow-hidden border-0 gap-0 pb-0 pt-0">
+        {resolveImageUrl(item.image) && (
+          <img
+            src={resolveImageUrl(item.image)}
+            className="h-40 w-full object-cover hover:scale-105 transition-transform duration-500"
+            alt={item.name}
+          />
+        )}
+        <CardContent className="bg-primary py-(--card-spacing)">
+          <h3 className="text-lg font-bold text-accent mb-2">{item.name}</h3>
+          <p className="text-sm text-primary-foreground/80 mb-4 line-clamp-3">{item.description}</p>
+            <Button
+              variant="accent" size="lg" className="w-full"
+              onClick={() => {
+                let url = `/busca/${item.id}/faculdade`;
+                if (courseId) url += `?highlightCourseId=${courseId}`;
+                navigate(url);
+              }}
+            >
+              Lista de cursos
+            </Button>
+        </CardContent>
+      </Card>
+    </motion.div>
+  );
+
+  return (
+    <Background title="Faculdades" showBackButton onBackPress={() => navigate('/busca')}>
+      <PageTransition>
+        <div className="flex-1 p-4">
+          {courseId && (
+            <motion.div
+              className="flex items-center bg-primary/5 rounded-xl p-3 mb-3 gap-2"
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+            >
+              <IoFilter size={16} className="text-primary shrink-0" />
+              <span className="text-xs text-primary font-semibold flex-1">
+                Mostrando faculdades com o curso selecionado
+              </span>
+              <button
+                onClick={() => { window.history.replaceState({}, '', '/busca/faculdades'); setColleges(colleges); setSearch(''); }}
+                className="text-xs text-primary font-bold underline cursor-pointer bg-transparent border-none shrink-0"
+              >
+                Limpar
+              </button>
+            </motion.div>
+          )}
+
+          <motion.div
+            className="relative mb-4"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <IoSearch size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-10 rounded-2xl"
+              placeholder="Buscar faculdade..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </motion.div>
+
+          <FilterBar
+            showDistance
+            maxDistance={maxDistance || undefined}
+            onMaxDistanceChange={(v) => { setMaxDistance(v); setPage(0); }}
+            sortBy={sortBy}
+            direction={direction}
+            onSortChange={handleSortChange}
+          />
+
+          {loading ? (
+            <FaculdadesSkeleton />
+          ) : displayList.length === 0 ? (
+            <motion.p
+              className="text-center text-sm text-muted-foreground mt-16"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              {maxDistance > 0 && !userLat
+                ? 'Permita acesso à localização para filtrar por distância'
+                : 'Nenhuma faculdade encontrada'}
+            </motion.p>
+          ) : (
+            <motion.div
+              className="space-y-4 pb-24"
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+            >
+              {displayList.map((item) => renderCard(item))}
+            </motion.div>
+          )}
+
+          {maxDistance > 0 && (
+            <Pagination current={page} total={totalPages} onChange={setPage} />
+          )}
+        </div>
+      </PageTransition>
+    </Background>
+  );
+}
