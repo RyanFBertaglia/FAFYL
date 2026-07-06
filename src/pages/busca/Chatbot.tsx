@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/layout/PageTransition';
+import { capelinhoCurioso } from '@/utils/capelinhoImages';
 
 const messageVariants = {
   hidden: { opacity: 0, y: 12, scale: 0.97 },
@@ -64,7 +65,7 @@ export default function ChatbotScreen() {
           <div className="flex-1 overflow-y-auto p-4 space-y-3">
             {messages.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2 py-16">
-                <img src="/images/curioso.png" className="w-16 h-16 rounded-full object-contain opacity-60" alt="" />
+                <img src={capelinhoCurioso} className="w-16 h-16 rounded-full object-contain opacity-60" alt="" />
                 <p className="text-sm">Digite uma mensagem para começar</p>
               </div>
             ) : (
@@ -93,7 +94,7 @@ export default function ChatbotScreen() {
                       layout
                     >
                       <img
-                        src="/images/curioso.png"
+                        src={capelinhoCurioso}
                         className="w-8 h-8 rounded-full object-contain shrink-0"
                         alt=""
                       />
@@ -111,7 +112,7 @@ export default function ChatbotScreen() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
               >
-                <img src="/images/curioso.png" className="w-8 h-8 rounded-full object-contain shrink-0" alt="" />
+                <img src={capelinhoCurioso} className="w-8 h-8 rounded-full object-contain shrink-0" alt="" />
                 <div className="bg-muted rounded-2xl rounded-bl-sm px-4 py-2.5">
                   <span className="text-foreground text-sm inline-block animate-pulse">
                     pensando...

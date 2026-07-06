@@ -1,9 +1,5 @@
 import { USE_MOCKS } from '@/config/env';
 import { UserDTO } from '@/types';
-import curiosoImg from '../../assets/images/curioso.png';
-import muitofelizImg from '../../assets/images/muitofeliz.png';
-import serioImg from '../../assets/images/serio.png';
-import tristeImg from '../../assets/images/triste.png';
 import { API_BASE, request } from './api';
 
 const MOCK_USER: UserDTO = {
@@ -34,16 +30,4 @@ export async function getUserCapelinho(): Promise<number | null> {
   }
 }
 
-export const CAPELINHO_IMAGES: Record<number, any> = {
-  1: curiosoImg,
-  2: tristeImg,
-  3: muitofelizImg,
-  4: serioImg,
-};
-
-export function getCapelinhoImage(capelinhoId: number | null | undefined): any {
-  if (!capelinhoId || !CAPELINHO_IMAGES[capelinhoId]) {
-    return CAPELINHO_IMAGES[1];
-  }
-  return CAPELINHO_IMAGES[capelinhoId];
-}
+export { CAPELINHO_IMAGES, getCapelinhoImage } from '@/utils/capelinhoImages';

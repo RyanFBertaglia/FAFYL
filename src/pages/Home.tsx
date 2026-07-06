@@ -7,6 +7,7 @@ import PageTransition from '@/components/layout/PageTransition';
 import SwipeablePage from '@/components/layout/SwipeablePage';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
+import { capelinhoCurioso } from '@/utils/capelinhoImages';
 
 const stagger = {
   hidden: { opacity: 0 },
@@ -108,7 +109,7 @@ export default function Home() {
                 <div className="flex items-center gap-3 mb-3">
                   <div className="w-12 h-12 rounded-xl flex items-center justify-center shrink-0 bg-primary/5">
                     <img
-                      src="./../assets/images/curioso.png"
+                      src={capelinhoCurioso}
                       className="w-9 h-9 rounded-lg object-contain"
                       alt="Capelinho"
                     />

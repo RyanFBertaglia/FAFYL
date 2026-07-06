@@ -8,6 +8,7 @@ import { getRecommendations } from '@/services/fafylService';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/layout/PageTransition';
+import { capelinhoTriste, capelinhoMuitofeliz } from '@/utils/capelinhoImages';
 
 const stagger = {
   hidden: { opacity: 0 },
@@ -79,7 +80,7 @@ export default function ResultadoScreen() {
         <PageTransition>
           <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
             <img
-              src="/images/triste.png"
+              src={capelinhoTriste}
               alt=""
               className="w-24 h-24 mb-5 animate-scale-in"
             />
@@ -119,7 +120,7 @@ export default function ResultadoScreen() {
             animate="visible"
           >
             <motion.img
-              src="/images/muitofeliz.png"
+              src={capelinhoMuitofeliz}
               alt=""
               className="w-16 h-16 mb-3"
               variants={fadeUp}
