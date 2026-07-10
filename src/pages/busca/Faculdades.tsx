@@ -92,6 +92,7 @@ export default function FaculdadesScreen() {
   }, [maxDistance, sortBy, direction, page, userLat, userLon, fetchFiltered]);
 
   useEffect(() => {
+    setPage(0);
     if (search.trim() === '') {
       if (!maxDistance) setFiltered(colleges);
     } else {
@@ -112,9 +113,12 @@ export default function FaculdadesScreen() {
     setPage(0);
   };
 
-  const displayList = maxDistance > 0 ? filtered : (
+  const ITEMS_PER_PAGE = 20;
+  const sourceList = maxDistance > 0 ? filtered : (
     search.trim() === '' ? colleges : filtered
   );
+  const displayTotalPages = maxDistance > 0 ? totalPages : Math.ceil(sourceList.length / ITEMS_PER_PAGE);
+  const displayList = maxDistance > 0 ? filtered : sourceList.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
   const renderCard = (item: College) => (
     <motion.div key={item.id} variants={itemVariants}>
@@ -214,8 +218,8 @@ export default function FaculdadesScreen() {
             </motion.div>
           )}
 
-          {maxDistance > 0 && (
-            <Pagination current={page} total={totalPages} onChange={setPage} />
+          {displayTotalPages > 1 && (
+            <Pagination current={page} total={displayTotalPages} onChange={setPage} />
           )}
         </div>
       </PageTransition>

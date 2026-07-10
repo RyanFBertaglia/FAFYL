@@ -7,13 +7,8 @@ import { getAllColleges, getCollegeCourses } from './collegeService';
 export async function getRecommendations(discProfile: Record<string, number>): Promise<Fafyl[]> {
   if (USE_MOCKS) return computeMockRecommendations(discProfile);
   try {
-    const response = await fetch(`${process.env.EXPO_PUBLIC_ENV === 'development' ? 'http://localhost:8080' : 'https://recommend-1-0.onrender.com'}/fafyl`, {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ discProfile }),
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return response.json();
+    const response = await request('/fafyl');
+    return response as Fafyl[];
   } catch {
     return computeMockRecommendations(discProfile);
   }

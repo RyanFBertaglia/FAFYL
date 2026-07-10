@@ -1,0 +1,1382 @@
+[
+  {
+    "id": 1,
+    "name": "Ciência da Computação",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 0.9
+    },
+    "description": "Focado no desenvolvimento de tecnologias, algoritmos e soluções de software.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 2,
+    "name": "Medicina",
+    "discWeights": {
+      "D": 0.8,
+      "I": 0.2,
+      "S": 1.0,
+      "C": 0.5
+    },
+    "description": "Formação para diagnóstico, tratamento e prevenção de doenças.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 3,
+    "name": "Direito",
+    "discWeights": {
+      "D": 1.0,
+      "I": 0.5,
+      "S": 0.8,
+      "C": 0.2
+    },
+    "description": "Estudo e aplicação das leis que regem a sociedade e as instituições.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 4,
+    "name": "Engenharia Civil",
+    "discWeights": {
+      "D": 0.5,
+      "I": 1.0,
+      "S": 0.2,
+      "C": 0.8
+    },
+    "description": "Planejamento, projeto e execução de infraestruturas e edificações.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 5,
+    "name": "Psicologia",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.8,
+      "S": 1.0,
+      "C": 0.3
+    },
+    "description": "Estudo dos processos mentais e do comportamento humano.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 6,
+    "name": "Design Gráfico",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.9,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Criação de soluções visuais para comunicação e identidade de marca.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 7,
+    "name": "Administração",
+    "discWeights": {
+      "D": 1.0,
+      "I": 0.7,
+      "S": 0.5,
+      "C": 0.6
+    },
+    "description": "Gerenciamento de recursos humanos, financeiros e materiais de organizações.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 8,
+    "name": "Enfermagem",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.3,
+      "S": 1.0,
+      "C": 0.5
+    },
+    "description": "Assistência direta ao paciente e suporte em procedimentos médicos.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 9,
+    "name": "Jornalismo",
+    "discWeights": {
+      "D": 0.5,
+      "I": 1.0,
+      "S": 0.6,
+      "C": 0.4
+    },
+    "description": "Investigação, redação e divulgação de informações e notícias.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 10,
+    "name": "Arquitetura e Urbanismo",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.7,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Projetos de espaços internos e externos visando estética e funcionalidade.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 11,
+    "name": "Engenharia de Produção",
+    "discWeights": {
+      "D": 0.8,
+      "I": 0.6,
+      "S": 0.3,
+      "C": 0.9
+    },
+    "description": "Otimização de processos produtivos e gestão industrial.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 12,
+    "name": "Engenharia Elétrica",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Projeto e manutenção de sistemas elétricos e eletrônicos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 13,
+    "name": "Engenharia Mecânica",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.4,
+      "S": 0.3,
+      "C": 0.9
+    },
+    "description": "Projeto, fabricação e manutenção de sistemas mecânicos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 14,
+    "name": "Engenharia de Computação",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.3,
+      "C": 1.0
+    },
+    "description": "Integração de hardware e software para desenvolvimento de sistemas computacionais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 15,
+    "name": "Ciências Econômicas",
+    "discWeights": {
+      "D": 1.0,
+      "I": 0.4,
+      "S": 0.5,
+      "C": 0.8
+    },
+    "description": "Análise de mercados, políticas econômicas e gestão financeira.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 16,
+    "name": "Farmácia",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.5,
+      "S": 0.9,
+      "C": 0.8
+    },
+    "description": "Pesquisa, desenvolvimento e produção de medicamentos e cosméticos.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 17,
+    "name": "Fisioterapia",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.7,
+      "S": 1.0,
+      "C": 0.5
+    },
+    "description": "Prevenção e reabilitação de disfunções do movimento humano.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 18,
+    "name": "Nutrição",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.6,
+      "S": 0.9,
+      "C": 0.7
+    },
+    "description": "Estudo dos alimentos e sua relação com a saúde humana.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 19,
+    "name": "Biomedicina",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Pesquisa e análise laboratorial para diagnóstico de doenças.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 20,
+    "name": "Educação Física",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.8,
+      "S": 0.6,
+      "C": 0.3
+    },
+    "description": "Promoção da saúde e desempenho através da atividade física e esportiva.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 21,
+    "name": "Publicidade e Propaganda",
+    "discWeights": {
+      "D": 0.7,
+      "I": 1.0,
+      "S": 0.3,
+      "C": 0.5
+    },
+    "description": "Criação e gestão de campanhas de comunicação e branding.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 22,
+    "name": "Sistemas de Informação",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.4,
+      "S": 0.3,
+      "C": 0.9
+    },
+    "description": "Gestão e desenvolvimento de soluções em tecnologia da informação.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 23,
+    "name": "Ciências Contábeis",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 1.0
+    },
+    "description": "Registro e análise financeira de organizações para tomada de decisão.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 24,
+    "name": "Relações Internacionais",
+    "discWeights": {
+      "D": 0.8,
+      "I": 0.8,
+      "S": 0.4,
+      "C": 0.6
+    },
+    "description": "Estudo das relações políticas, econômicas e culturais entre nações.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 25,
+    "name": "Letras",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.6,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Estudo da língua, literatura e cultura de diferentes povos.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 26,
+    "name": "Pedagogia",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.7,
+      "S": 1.0,
+      "C": 0.5
+    },
+    "description": "Formação de educadores para atuação no ensino infantil e fundamental.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 27,
+    "name": "Odontologia",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.5,
+      "S": 0.9,
+      "C": 0.8
+    },
+    "description": "Diagnóstico e tratamento de doenças e condições da cavidade oral.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 28,
+    "name": "Medicina Veterinária",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.6,
+      "S": 1.0,
+      "C": 0.6
+    },
+    "description": "Prevenção e tratamento de doenças em animais.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 29,
+    "name": "Design de Moda",
+    "discWeights": {
+      "D": 0.4,
+      "I": 1.0,
+      "S": 0.3,
+      "C": 0.8
+    },
+    "description": "Criação e desenvolvimento de coleções de vestuário e acessórios.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 30,
+    "name": "Cinema e Audiovisual",
+    "discWeights": {
+      "D": 0.5,
+      "I": 1.0,
+      "S": 0.3,
+      "C": 0.7
+    },
+    "description": "Produção e direção de obras cinematográficas e audiovisuais.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 31,
+    "name": "Marketing",
+    "discWeights": {
+      "D": 0.9,
+      "I": 0.9,
+      "S": 0.3,
+      "C": 0.5
+    },
+    "description": "Estratégias de mercado, posicionamento de marca e comportamento do consumidor.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 32,
+    "name": "Gestão de Recursos Humanos",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.8,
+      "S": 0.9,
+      "C": 0.5
+    },
+    "description": "Administração de pessoas e talentos nas organizações.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 33,
+    "name": "Análise e Desenvolvimento de Sistemas",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.3,
+      "C": 0.9
+    },
+    "description": "Projeto e implementação de sistemas de software para negócios.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 34,
+    "name": "Ciências Biológicas",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.4,
+      "S": 0.8,
+      "C": 0.9
+    },
+    "description": "Estudo da vida e dos organismos em seus diversos níveis de organização.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 35,
+    "name": "Fonoaudiologia",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.7,
+      "S": 1.0,
+      "C": 0.6
+    },
+    "description": "Prevenção e tratamento de distúrbios da comunicação humana.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 36,
+    "name": "Serviço Social",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.7,
+      "S": 1.0,
+      "C": 0.3
+    },
+    "description": "Intervenção em questões sociais visando garantia de direitos e cidadania.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 37,
+    "name": "Artes Visuais",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.9,
+      "S": 0.5,
+      "C": 0.8
+    },
+    "description": "Expressão artística através de linguagens visuais contemporâneas.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 38,
+    "name": "Gastronomia",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.8,
+      "S": 0.4,
+      "C": 0.9
+    },
+    "description": "Arte e técnica da culinária e gestão de serviços gastronômicos.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 39,
+    "name": "Administração Pública",
+    "discWeights": {
+      "D": 0.9,
+      "I": 0.5,
+      "S": 0.7,
+      "C": 0.8
+    },
+    "description": "Gestão de organizações e políticas do setor público.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 40,
+    "name": "Ciência de Dados",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.2,
+      "S": 0.3,
+      "C": 1.0
+    },
+    "description": "Análise e interpretação de grandes volumes de dados para tomada de decisão.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 41,
+    "name": "Estatística",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.3,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Coleta, análise e interpretação de dados para tomada de decisão.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 42,
+    "name": "Física",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Estudo das leis fundamentais que regem o universo e a matéria.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 43,
+    "name": "Química",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.2,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Estudo da composição, estrutura e transformação da matéria.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 44,
+    "name": "Engenharia Química",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Processos químicos industriais e desenvolvimento de novos materiais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 45,
+    "name": "Engenharia de Alimentos",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.4,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Processamento, conservação e inovação na indústria alimentícia.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 46,
+    "name": "Matemática Aplicada e Computacional",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Modelagem matemática e computacional para problemas científicos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 47,
+    "name": "História",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.5,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Estudo dos processos históricos e suas interpretações.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 48,
+    "name": "Ciências Sociais",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.6,
+      "S": 0.7,
+      "C": 0.8
+    },
+    "description": "Estudo das estruturas sociais, culturais e políticas da sociedade.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 49,
+    "name": "Filosofia",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.4,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Reflexão crítica sobre fundamentos do conhecimento, ética e existência.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 50,
+    "name": "Geografia",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.5,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Estudo do espaço geográfico e das relações sociedade-natureza.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 51,
+    "name": "Linguística",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.5,
+      "S": 0.7,
+      "C": 1.0
+    },
+    "description": "Estudo científico da linguagem humana e suas estruturas.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 52,
+    "name": "Música",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.9,
+      "S": 0.5,
+      "C": 0.8
+    },
+    "description": "Formação em performance, composição e teoria musical.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 53,
+    "name": "Dança",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.9,
+      "S": 0.6,
+      "C": 0.5
+    },
+    "description": "Expressão artística através do movimento corporal e da coreografia.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 54,
+    "name": "Artes Cênicas",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.9,
+      "S": 0.5,
+      "C": 0.6
+    },
+    "description": "Formação em teatro, interpretação e direção cênica.",
+    "category": "CRIATIVAS"
+  },
+  {
+    "id": 55,
+    "name": "Comunicação Social - Midialogia",
+    "discWeights": {
+      "D": 0.5,
+      "I": 1.0,
+      "S": 0.4,
+      "C": 0.6
+    },
+    "description": "Produção multimídia integrando linguagens audiovisuais, sonoras e digitais.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 56,
+    "name": "Engenharia de Controle e Automação",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.3,
+      "C": 1.0
+    },
+    "description": "Sistemas de controle e automação de processos industriais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 57,
+    "name": "Geologia",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Estudo da composição, estrutura e história da Terra.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 58,
+    "name": "Saneamento Ambiental",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Gestão de recursos hídricos e tratamento de efluentes e resíduos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 59,
+    "name": "Engenharia de Telecomunicações",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Sistemas de transmissão, recepção e processamento de sinais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 60,
+    "name": "Engenharia Ambiental",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.4,
+      "S": 0.8,
+      "C": 0.9
+    },
+    "description": "Soluções para preservação ambiental e desenvolvimento sustentável.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 61,
+    "name": "Engenharia de Manufatura",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.4,
+      "S": 0.3,
+      "C": 0.9
+    },
+    "description": "Processos de fabricação avançada e gestão da produção industrial.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 62,
+    "name": "Engenharia Física",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Aplicação de conceitos físicos ao desenvolvimento de tecnologias inovadoras.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 63,
+    "name": "Engenharia de Transportes",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.4,
+      "S": 0.5,
+      "C": 0.9
+    },
+    "description": "Planejamento, projeto e operação de sistemas de transporte.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 64,
+    "name": "Química Tecnológica",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Processos químicos aplicados à indústria e desenvolvimento de produtos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 65,
+    "name": "Ciências do Esporte",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.7,
+      "S": 0.6,
+      "C": 0.5
+    },
+    "description": "Estudo científico do movimento humano aplicado ao esporte e performance.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 66,
+    "name": "Engenharia Agrícola",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.6,
+      "C": 0.9
+    },
+    "description": "Tecnologias para mecanização e otimização da produção agrícola.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 67,
+    "name": "Estudos Literários",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.7,
+      "S": 0.6,
+      "C": 0.9
+    },
+    "description": "Análise e crítica da literatura em suas dimensões teórica e histórica.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 68,
+    "name": "Meteorologia",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Estudo da atmosfera e previsão do tempo.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 69,
+    "name": "Ecologia",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.5,
+      "S": 0.8,
+      "C": 0.9
+    },
+    "description": "Estudo das relações entre organismos e o meio ambiente.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 70,
+    "name": "Engenharia Florestal",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Manejo e conservação de florestas e recursos naturais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 71,
+    "name": "Zootecnia",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.4,
+      "S": 0.8,
+      "C": 0.8
+    },
+    "description": "Produção e manejo de animais domésticos.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 72,
+    "name": "Arquivologia",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.5,
+      "S": 0.8,
+      "C": 1.0
+    },
+    "description": "Gestão e preservação de documentos e arquivos.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 73,
+    "name": "Biblioteconomia",
+    "discWeights": {
+      "D": 0.2,
+      "I": 0.6,
+      "S": 0.7,
+      "C": 1.0
+    },
+    "description": "Organização e gestão de bibliotecas e acervos.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 74,
+    "name": "Terapia Ocupacional",
+    "discWeights": {
+      "D": 0.3,
+      "I": 0.7,
+      "S": 1.0,
+      "C": 0.6
+    },
+    "description": "Reabilitação e inclusão social por meio de atividades ocupacionais.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 75,
+    "name": "Engenharia de Materiais",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Desenvolvimento e processamento de materiais avançados.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 76,
+    "name": "Engenharia de Bioprocessos e Biotecnologia",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.6,
+      "C": 0.9
+    },
+    "description": "Processos biotecnológicos e produção de bioinsumos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 77,
+    "name": "Ciências Biomédicas",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Pesquisa em ciências da saúde e biomedicina.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 78,
+    "name": "Física Médica",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.2,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Aplicação da física em diagnóstico e terapia médica.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 79,
+    "name": "Engenharia Aeronáutica",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Projeto e construção de aeronaves e sistemas aeroespaciais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 80,
+    "name": "Turismo",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.9,
+      "S": 0.5,
+      "C": 0.4
+    },
+    "description": "Gestão de destinos, hospitalidade e eventos turísticos.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 81,
+    "name": "Relações Públicas",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.9,
+      "S": 0.7,
+      "C": 0.5
+    },
+    "description": "Gestão da comunicação entre organizações e seus públicos.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 82,
+    "name": "Engenharia de Biossistemas",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 0.9
+    },
+    "description": "Sistemas integrados de produção agrícola e biológica.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 83,
+    "name": "Engenharia Industrial-Madeira",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 0.9
+    },
+    "description": "Processamento e aproveitamento industrial da madeira.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 84,
+    "name": "Engenharia de Energia",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Geração e distribuição de energia elétrica e fontes renováveis.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 85,
+    "name": "Engenharia de Pesca",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.4,
+      "S": 0.7,
+      "C": 0.8
+    },
+    "description": "Exploração sustentável de recursos pesqueiros.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 86,
+    "name": "Engenharia Cartográfica e de Agrimensura",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Geoprocessamento, cartografia e levantamentos topográficos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 87,
+    "name": "Engenharia Agronômica",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Tecnologias para produção agrícola e agropecuária.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 88,
+    "name": "Comunicação Social - Rádio, TV e Internet",
+    "discWeights": {
+      "D": 0.5,
+      "I": 1.0,
+      "S": 0.4,
+      "C": 0.6
+    },
+    "description": "Produção multimídia para rádio, televisão e plataformas digitais.",
+    "category": "COMUNICACAO"
+  },
+  {
+    "id": 89,
+    "name": "Gestão da Tecnologia da Informação",
+    "discWeights": {
+      "D": 0.8,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 0.9
+    },
+    "description": "Gestão de infraestrutura e serviços de TI nas organizações.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 90,
+    "name": "Gestão de Energia e Eficiência Energética",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Eficiência energética e fontes renováveis.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 91,
+    "name": "Gestão Empresarial (Tecnólogo)",
+    "discWeights": {
+      "D": 1.0,
+      "I": 0.7,
+      "S": 0.5,
+      "C": 0.6
+    },
+    "description": "Gestão de processos empresariais e administrativos.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 92,
+    "name": "Logística",
+    "discWeights": {
+      "D": 0.8,
+      "I": 0.4,
+      "S": 0.5,
+      "C": 0.9
+    },
+    "description": "Planejamento e gestão de cadeias de suprimentos.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 93,
+    "name": "Processos Químicos",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.2,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Operação e controle de processos químicos industriais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 94,
+    "name": "Automação Industrial",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.2,
+      "S": 0.3,
+      "C": 1.0
+    },
+    "description": "Sistemas automatizados para processos industriais.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 95,
+    "name": "Banco de Dados",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.2,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Modelagem e administração de bancos de dados.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 96,
+    "name": "Gestão Hospitalar",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.5,
+      "S": 0.9,
+      "C": 0.7
+    },
+    "description": "Administração de instituições de saúde.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 97,
+    "name": "Redes de Computadores",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.2,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Projeto e gerenciamento de redes de computadores.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 98,
+    "name": "Sistemas Biomédicos",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Tecnologia aplicada a equipamentos médicos e hospitalares.",
+    "category": "SAUDE"
+  },
+  {
+    "id": 99,
+    "name": "Gestão de Negócios e Inovação",
+    "discWeights": {
+      "D": 0.9,
+      "I": 0.8,
+      "S": 0.4,
+      "C": 0.6
+    },
+    "description": "Inovação e gestão estratégica de negócios.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 100,
+    "name": "Eletrônica Automotiva",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.3,
+      "C": 1.0
+    },
+    "description": "Sistemas eletrônicos veiculares e automotivos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 101,
+    "name": "Fabricação Mecânica",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Processos de fabricação e usinagem mecânica.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 102,
+    "name": "Gestão da Qualidade",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.3,
+      "S": 0.6,
+      "C": 0.9
+    },
+    "description": "Sistemas de gestão da qualidade e melhoria contínua.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 103,
+    "name": "Manutenção de Aeronaves",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Manutenção e reparo de aeronaves.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 104,
+    "name": "Polímeros",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.2,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Processamento e produção de materiais poliméricos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 105,
+    "name": "Processos Metalúrgicos",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Processos de transformação de metais e ligas.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 106,
+    "name": "Projetos Mecânicos",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 1.0
+    },
+    "description": "Projeto e desenvolvimento de sistemas mecânicos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 107,
+    "name": "Gestão de Eventos",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.9,
+      "S": 0.6,
+      "C": 0.4
+    },
+    "description": "Planejamento e organização de eventos corporativos e sociais.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 108,
+    "name": "Agronegócio",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.4,
+      "S": 0.5,
+      "C": 0.9
+    },
+    "description": "Gestão de cadeias produtivas do agronegócio.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 109,
+    "name": "Produção Agropecuária",
+    "discWeights": {
+      "D": 0.6,
+      "I": 0.3,
+      "S": 0.6,
+      "C": 0.8
+    },
+    "description": "Manejo e produção animal e vegetal.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 110,
+    "name": "Gestão Comercial",
+    "discWeights": {
+      "D": 1.0,
+      "I": 0.8,
+      "S": 0.4,
+      "C": 0.5
+    },
+    "description": "Gestão de vendas e canais comerciais.",
+    "category": "HUMANAS"
+  },
+  {
+    "id": 111,
+    "name": "Gestão da Produção Industrial",
+    "discWeights": {
+      "D": 0.8,
+      "I": 0.3,
+      "S": 0.5,
+      "C": 0.9
+    },
+    "description": "Planejamento e controle da produção industrial.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 112,
+    "name": "Segurança da Informação",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.5,
+      "C": 1.0
+    },
+    "description": "Proteção de dados e sistemas de informação.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 113,
+    "name": "Alimentos",
+    "discWeights": {
+      "D": 0.4,
+      "I": 0.3,
+      "S": 0.7,
+      "C": 0.9
+    },
+    "description": "Tecnologia e processamento de alimentos.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 114,
+    "name": "Biocombustíveis",
+    "discWeights": {
+      "D": 0.5,
+      "I": 0.2,
+      "S": 0.6,
+      "C": 1.0
+    },
+    "description": "Produção de combustíveis renováveis.",
+    "category": "EXATAS"
+  },
+  {
+    "id": 115,
+    "name": "Manufatura Avançada",
+    "discWeights": {
+      "D": 0.7,
+      "I": 0.3,
+      "S": 0.4,
+      "C": 0.9
+    },
+    "description": "Tecnologias avançadas de fabricação e manufatura digital.",
+    "category": "EXATAS"
+  }
+]

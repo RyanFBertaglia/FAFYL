@@ -44,6 +44,7 @@ export default function CursosScreen() {
   }, []);
 
   useEffect(() => {
+    setPage(0);
     if (search.trim() === '') {
       setFiltered(courses);
     } else {
@@ -80,9 +81,12 @@ export default function CursosScreen() {
     setPage(0);
   };
 
-  const displayList = category || sortBy !== 'name' ? filtered : (
+  const ITEMS_PER_PAGE = 20;
+  const sourceList = category || sortBy !== 'name' ? filtered : (
     search.trim() === '' ? courses : filtered
   );
+  const displayTotalPages = category || sortBy !== 'name' ? totalPages : Math.ceil(sourceList.length / ITEMS_PER_PAGE);
+  const displayList = category || sortBy !== 'name' ? filtered : sourceList.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
 
   return (
     <Background title="Cursos" showBackButton onBackPress={() => navigate('/busca')}>
@@ -151,8 +155,8 @@ export default function CursosScreen() {
             </motion.div>
           )}
 
-          {(category || sortBy !== 'name') && (
-            <Pagination current={page} total={totalPages} onChange={setPage} />
+          {displayTotalPages > 1 && (
+            <Pagination current={page} total={displayTotalPages} onChange={setPage} />
           )}
         </div>
       </PageTransition>

@@ -15,6 +15,7 @@ export interface Course {
   name: string;
   discWeights: Record<string, number>;
   description: string;
+  category?: CourseCategory;
 }
 
 export interface College {

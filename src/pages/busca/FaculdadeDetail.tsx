@@ -1,5 +1,6 @@
 import Background from '@/components/layout/background';
 import MapModal from '@/components/MapModal';
+import Pagination from '@/components/filter/Pagination';
 import { getAllColleges, getCollegeCourses } from '@/services/collegeService';
 import { College, CourseImp } from '@/types';
 import { IoChevronForward, IoMap, IoLocate } from 'react-icons/io5';
@@ -13,6 +14,8 @@ import PageTransition from '@/components/layout/PageTransition';
 import { getCachedLocation, setCachedLocation } from '@/utils/locationCache';
 import { calculateHaversineDistance, formatDistanceCompact } from '@/utils/distance';
 import { USE_MOCKS } from '@/config/env';
+
+const COURSES_PER_PAGE = 15;
 
 const stagger = {
   hidden: { opacity: 0 },
@@ -38,6 +41,7 @@ export default function FaculdadeDetailScreen() {
   const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState(false);
+  const [coursePage, setCoursePage] = useState(0);
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -128,6 +132,12 @@ export default function FaculdadeDetailScreen() {
           college.locale.lon
         )
       : null;
+
+  const totalCoursePages = Math.ceil(courses.length / COURSES_PER_PAGE);
+  const displayedCourses = courses.slice(
+    coursePage * COURSES_PER_PAGE,
+    (coursePage + 1) * COURSES_PER_PAGE
+  );
 
   const isHighlighted = (courseId: number) => highlightedId === courseId;
 
@@ -223,7 +233,7 @@ export default function FaculdadeDetailScreen() {
               </motion.p>
             ) : (
               <motion.div className="space-y-3 pb-24" variants={fadeUp}>
-                {courses.map((course) => (
+                {displayedCourses.map((course) => (
                   <motion.div
                     key={course.id}
                     id={`course-${course.id}`}
@@ -255,6 +265,10 @@ export default function FaculdadeDetailScreen() {
                   </motion.div>
                 ))}
               </motion.div>
+            )}
+
+            {totalCoursePages > 1 && (
+              <Pagination current={coursePage} total={totalCoursePages} onChange={setCoursePage} />
             )}
           </motion.div>
         </div>
