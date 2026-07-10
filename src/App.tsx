@@ -13,6 +13,7 @@ import Cursos from '@/pages/busca/Cursos';
 import Chatbot from '@/pages/busca/Chatbot';
 import CursoDetail from '@/pages/busca/CursoDetail';
 import FaculdadeDetail from '@/pages/busca/FaculdadeDetail';
+import Adicionar from '@/pages/Adicionar';
 import Quiz from '@/pages/quiz/Quiz';
 import Resultado from '@/pages/quiz/QuizResultado';
 import Profile from '@/pages/profile/Profile';
@@ -43,6 +44,7 @@ function AnimatedRoutes() {
         <Route path="/quiz-info" element={<QuizInfo />} />
         <Route path="/busca" element={<Busca />} />
         <Route path="/sobre" element={<Sobre />} />
+        <Route path="/adicionar" element={<Adicionar />} />
       </Routes>
     </AnimatePresence>
   );

@@ -7,7 +7,7 @@ import { getAllCollegesData, getAllCourseImpsData } from './dataLoader';
 export async function getAllColleges(): Promise<College[]> {
   if (USE_MOCKS) return getAllCollegesData();
   try {
-    const response: any = await request('/college');
+    const response: any = await request('/college?size=500');
     return response.content || response;
   } catch {
     return getAllCollegesData();
