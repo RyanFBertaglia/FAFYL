@@ -2,9 +2,10 @@ import Background from '@/components/layout/background';
 import MapModal from '@/components/MapModal';
 import Pagination from '@/components/filter/Pagination';
 import { getAllColleges, getCollegeCourses } from '@/services/collegeService';
+import { getAllCollegesData, getAllCourseImpsData } from '@/services/dataLoader';
 import { College, CourseImp } from '@/types';
 import { IoChevronForward, IoMap, IoLocate } from 'react-icons/io5';
-import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import FaculdadeDetailSkeleton from '@/components/skeletons/FaculdadeDetailSkeleton';
@@ -27,8 +28,11 @@ const fadeUp = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.35 } },
 };
 
+const SCROLL_STORAGE_KEY = 'fdd_scroll';
+
 export default function FaculdadeDetailScreen() {
   const { id } = useParams<{ id: string }>();
+  const location = useLocation();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const highlightCourseId = searchParams.get('highlightCourseId');
@@ -49,13 +53,23 @@ export default function FaculdadeDetailScreen() {
     const collegeId = parseInt(id || '0', 10);
     Promise.all([getAllColleges(), getCollegeCourses(collegeId)]).then(
       ([colleges, courseList]) => {
-        const found = colleges.find((c) => c.id === collegeId);
-        setCollege(found || null);
-        setCourses(courseList);
+        const found = colleges.find((c) => c.id === collegeId) || getAllCollegesData().find((c) => c.id === collegeId) || null;
+        setCollege(found);
+        setCourses(found ? courseList : getAllCourseImpsData().filter((imp) => imp.college.id === collegeId));
         setLoading(false);
       }
     );
   }, [id]);
+
+  useEffect(() => {
+    if (!loading && scrollRef.current) {
+      const saved = sessionStorage.getItem(`${SCROLL_STORAGE_KEY}_${id}`);
+      if (saved) {
+        scrollRef.current.scrollTop = parseInt(saved, 10);
+        sessionStorage.removeItem(`${SCROLL_STORAGE_KEY}_${id}`);
+      }
+    }
+  }, [loading, id]);
 
   useEffect(() => {
     if (highlightCourseId && courses.length > 0 && !loading) {
@@ -252,7 +266,12 @@ export default function FaculdadeDetailScreen() {
                   >
                     <button
                       className="flex items-center bg-card rounded-2xl p-4 w-full text-left cursor-pointer border-none shadow-sm active:scale-[0.99] transition-transform"
-                      onClick={() => navigate(`/busca/${course.course?.id || course.id}/curso`)}
+                      onClick={() => {
+                        if (scrollRef.current) {
+                          sessionStorage.setItem(`${SCROLL_STORAGE_KEY}_${id}`, String(scrollRef.current.scrollTop));
+                        }
+                        navigate(`/busca/${course.course?.id || course.id}/curso?collegeId=${college?.id}`);
+                      }}
                     >
                       <div className="flex-1 min-w-0 mr-2.5">
                         <p className="text-base font-semibold text-primary mb-1 truncate">{course.course?.name || 'Curso'}</p>

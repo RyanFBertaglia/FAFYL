@@ -79,6 +79,10 @@ export default function FaculdadesScreen() {
   }, []);
 
   useEffect(() => {
+    setPage(0);
+  }, [maxDistance, sortBy, direction]);
+
+  useEffect(() => {
     if (maxDistance > 0 && userLat && userLon) {
       fetchFiltered({
         lat: userLat, lon: userLon, maxDistance,
@@ -86,8 +90,6 @@ export default function FaculdadesScreen() {
       });
     } else if (maxDistance > 0 && !userLat) {
       setFiltered([]);
-    } else {
-      setPage(0);
     }
   }, [maxDistance, sortBy, direction, page, userLat, userLon, fetchFiltered]);
 

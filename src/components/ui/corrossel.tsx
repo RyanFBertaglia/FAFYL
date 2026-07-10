@@ -1,4 +1,6 @@
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { getAllCollegesData } from '@/services/dataLoader';
+import { resolveImageUrl } from '@/utils/imageResolver';
 
 function useScreenDimensions() {
   const [width, setWidth] = useState(window.innerWidth);
@@ -10,7 +12,7 @@ function useScreenDimensions() {
   return width;
 }
 
-interface College {
+interface CollegeItem {
   id: string;
   name: string;
   description: string;
@@ -18,22 +20,27 @@ interface College {
   image: string;
 }
 
-const MOCK_COLLEGES: College[] = [
-  { id: '1', name: 'FAFYL', description: 'Tecnologia e Inovação', color: '#010080', image: 'https://images.unsplash.com/photo-1562774053-701939374585?w=400&q=80' },
-  { id: '2', name: 'Tech College', description: 'Engenharia & Design', color: '#1a1a9e', image: 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?w=400&q=80' },
-  { id: '3', name: 'Nova Academy', description: 'Ciências da Computação', color: '#3300cc', image: 'https://images.unsplash.com/photo-1523050854058-8df90110c8f1?w=400&q=80' },
-  { id: '4', name: 'Future School', description: 'Negócios Digitais', color: '#4d00ff', image: 'https://images.unsplash.com/photo-1592280771190-3e2e4d571952?w=400&q=80' },
-  { id: '5', name: 'Smart College', description: 'Inteligência Artificial', color: '#6633ff', image: 'https://images.unsplash.com/photo-1519452635265-7b1fbfd1e4e0?w=400&q=80' },
-];
+const FEATURED_IDS = [1, 19, 20, 74, 86];
+
+const COLLEGE_COLORS: Record<number, string> = {
+  1: '#010080',
+  19: '#010080',
+  20: '#010080',
+  74: '#010080',
+  86: '#010080',
+};
+
+
 
 const CARD_MARGIN = 6;
 
-function Card({ item, index, scrollLeft, cardWidth, containerWidth, onViewCollege }: { item: College; index: number; scrollLeft: number; cardWidth: number; containerWidth: number; onViewCollege?: (id: string) => void }) {
+function Card({ item, index, scrollLeft, cardWidth, containerWidth, onViewCollege }: { item: CollegeItem; index: number; scrollLeft: number; cardWidth: number; containerWidth: number; onViewCollege?: (id: string) => void }) {
   const center = index * (cardWidth + CARD_MARGIN * 2) + cardWidth / 2;
   const viewCenter = scrollLeft + containerWidth / 2;
   const distance = Math.abs(viewCenter - center);
   const scale = Math.max(0.8, 1 - (distance / containerWidth) * 0.2);
   const opacity = Math.max(0.4, 1 - (distance / containerWidth) * 0.6);
+  const resolvedImage = resolveImageUrl(item.image);
 
   return (
     <div
@@ -50,14 +57,22 @@ function Card({ item, index, scrollLeft, cardWidth, containerWidth, onViewColleg
         style={{
           borderRadius: 25,
           overflow: 'hidden',
-          backgroundColor: '#010080',
+          background: resolvedImage ? item.color : `linear-gradient(135deg, ${item.color}, ${item.color}dd)`,
         }}
       >
-        <img
-          src={item.image}
-          alt={item.name}
-          style={{ width: '100%', height: 100, objectFit: 'cover', display: 'block' }}
-        />
+        {resolvedImage ? (
+          <img
+            src={resolvedImage}
+            alt={item.name}
+            style={{ width: '100%', height: 100, objectFit: 'cover', display: 'block' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: 100, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <span style={{ fontSize: 32, fontWeight: 'bold', color: '#FFD700', opacity: 0.6 }}>
+              {item.name.charAt(0)}
+            </span>
+          </div>
+        )}
         <div style={{ padding: 16, textAlign: 'center' as const }}>
           <p style={{ fontSize: 20, fontWeight: 'bold', color: '#FFD700', margin: 0 }}>{item.name}</p>
           <p style={{ fontSize: 13, color: '#fff', textAlign: 'center', margin: '8px 0' }}>{item.description}</p>
@@ -88,24 +103,41 @@ export default function Corrossel({ onViewCollege }: { onViewCollege?: (id: stri
   const [scrollLeft, setScrollLeft] = useState(0);
   const [isInteracting, setIsInteracting] = useState(false);
   const pauseRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [items, setItems] = useState<CollegeItem[]>([]);
+
+  useEffect(() => {
+    const allColleges = getAllCollegesData();
+    const featured = FEATURED_IDS.map((id) => {
+      const col = allColleges.find((c) => c.id === id);
+      if (!col) return null;
+      return {
+        id: String(col.id),
+        name: col.name,
+        description: col.description.length > 50 ? col.description.slice(0, 50) + '…' : col.description,
+        color: COLLEGE_COLORS[id] || '#010080',
+        image: col.image || '',
+      };
+    }).filter(Boolean) as CollegeItem[];
+    setItems(featured);
+  }, []);
 
   const REPEAT_COUNT = 10;
-  const DATA = Array(REPEAT_COUNT).fill(MOCK_COLLEGES).flat();
+  const DATA = items.length > 0 ? Array(REPEAT_COUNT).fill(items).flat() : [];
   const cardWidth = screenWidth * 0.7;
   const itemWidth = cardWidth + CARD_MARGIN * 2;
   const middleIndex = Math.floor(DATA.length / 2);
   const middleOffset = middleIndex * itemWidth;
-  const oneLoopWidth = MOCK_COLLEGES.length * itemWidth;
+  const oneLoopWidth = items.length * itemWidth;
 
   useEffect(() => {
-    if (scrollRef.current) {
+    if (scrollRef.current && DATA.length > 0) {
       scrollRef.current.scrollLeft = middleOffset;
       setScrollLeft(middleOffset);
     }
-  }, []);
+  }, [items, DATA.length, middleOffset]);
 
   useEffect(() => {
-    if (isInteracting) return;
+    if (isInteracting || items.length === 0) return;
     const step = 0.8 * (screenWidth / 390);
     const id = setInterval(() => {
       if (scrollRef.current) {
@@ -117,7 +149,7 @@ export default function Corrossel({ onViewCollege }: { onViewCollege?: (id: stri
       }
     }, 20);
     return () => clearInterval(id);
-  }, [isInteracting, screenWidth, middleOffset, oneLoopWidth]);
+  }, [isInteracting, screenWidth, middleOffset, oneLoopWidth, items.length]);
 
   const handleScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -135,6 +167,8 @@ export default function Corrossel({ onViewCollege }: { onViewCollege?: (id: stri
     e.stopPropagation();
     pauseRef.current = setTimeout(() => setIsInteracting(false), 3000);
   };
+
+  if (items.length === 0) return null;
 
   return (
     <div style={{ width: '100%', height: cardWidth * 0.85 + 40, position: 'relative' }}>

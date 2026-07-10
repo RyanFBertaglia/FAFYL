@@ -68,10 +68,12 @@ export default function CursosScreen() {
   }, []);
 
   useEffect(() => {
+    setPage(0);
+  }, [category, sortBy, direction]);
+
+  useEffect(() => {
     if (category || sortBy !== 'name') {
       fetchFiltered({ category: category || undefined, sortBy, direction, page, size: 20 });
-    } else {
-      setPage(0);
     }
   }, [category, sortBy, direction, page, fetchFiltered]);
 
