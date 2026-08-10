@@ -1,7 +1,8 @@
 import Background from '@/components/layout/background';
 import MapModal from '@/components/MapModal';
 import Pagination from '@/components/filter/Pagination';
-import { getAllColleges, getCollegeCourses } from '@/services/collegeService';
+import FilterBar from '@/components/filter/FilterBar';
+import { getAllColleges } from '@/services/collegeService';
 import { getAllCollegesData, getAllCourseImpsData } from '@/services/dataLoader';
 import { College, CourseImp } from '@/types';
 import { IoChevronForward, IoMap, IoLocate } from 'react-icons/io5';
@@ -46,19 +47,20 @@ export default function FaculdadeDetailScreen() {
   const [locationLoading, setLocationLoading] = useState(false);
   const [locationError, setLocationError] = useState(false);
   const [coursePage, setCoursePage] = useState(0);
+  const [category, setCategory] = useState('');
 
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const collegeId = parseInt(id || '0', 10);
-    Promise.all([getAllColleges(), getCollegeCourses(collegeId)]).then(
-      ([colleges, courseList]) => {
-        const found = colleges.find((c) => c.id === collegeId) || getAllCollegesData().find((c) => c.id === collegeId) || null;
-        setCollege(found);
-        setCourses(found ? courseList : getAllCourseImpsData().filter((imp) => imp.college.id === collegeId));
-        setLoading(false);
-      }
-    );
+    getAllColleges().then((colleges) => {
+      const found = colleges.find((c) => c.id === collegeId) || getAllCollegesData().find((c) => c.id === collegeId) || null;
+      setCollege(found);
+      setCourses(found && found.courses.length > 0
+        ? found.courses
+        : getAllCourseImpsData().filter((imp) => imp.college.id === collegeId));
+      setLoading(false);
+    });
   }, [id]);
 
   useEffect(() => {
@@ -147,8 +149,11 @@ export default function FaculdadeDetailScreen() {
         )
       : null;
 
-  const totalCoursePages = Math.ceil(courses.length / COURSES_PER_PAGE);
-  const displayedCourses = courses.slice(
+  const filteredCourses = category
+    ? courses.filter((c) => c.course?.category === category)
+    : courses;
+  const totalCoursePages = Math.ceil(filteredCourses.length / COURSES_PER_PAGE);
+  const displayedCourses = filteredCourses.slice(
     coursePage * COURSES_PER_PAGE,
     (coursePage + 1) * COURSES_PER_PAGE
   );
@@ -238,12 +243,20 @@ export default function FaculdadeDetailScreen() {
               Cursos oferecidos:
             </motion.h2>
 
-            {courses.length === 0 ? (
+            <div className="mb-3">
+              <FilterBar
+                showCategory
+                category={category}
+                onCategoryChange={(v) => { setCategory(v); setCoursePage(0); }}
+              />
+            </div>
+
+            {filteredCourses.length === 0 ? (
               <motion.p
                 className="text-center text-sm text-muted-foreground mt-10"
                 variants={fadeUp}
               >
-                Nenhum curso disponível
+                {courses.length === 0 ? 'Nenhum curso disponível' : 'Nenhum curso nessa área'}
               </motion.p>
             ) : (
               <motion.div className="space-y-3 pb-24" variants={fadeUp}>

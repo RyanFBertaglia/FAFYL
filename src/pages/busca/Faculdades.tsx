@@ -4,7 +4,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { College, CollegeFilters } from '@/types';
-import { getAllColleges, getCollegesFiltered, getCollegeCourses } from '@/services/collegeService';
+import { getAllColleges, getCollegesFiltered } from '@/services/collegeService';
 import FaculdadesSkeleton from '@/components/skeletons/FaculdadesSkeleton';
 import { resolveImageUrl } from '@/utils/imageResolver';
 import { Input } from '@/components/ui/input';
@@ -46,14 +46,9 @@ export default function FaculdadesScreen() {
       let filteredColleges = data;
       if (courseId) {
         const id = parseInt(courseId, 10);
-        const withCourse: College[] = [];
-        for (const college of data) {
-          const imps = await getCollegeCourses(college.id);
-          if (imps.some((imp) => imp.course.id === id)) {
-            withCourse.push(college);
-          }
-        }
-        filteredColleges = withCourse;
+        filteredColleges = data.filter((college) =>
+          college.courses.some((imp) => imp.course.id === id)
+        );
       }
       setColleges(filteredColleges);
       setFiltered(filteredColleges);

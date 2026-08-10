@@ -1,16 +1,19 @@
 import Background from '@/components/layout/background';
 import MapModal from '@/components/MapModal';
 import CursoDetailSkeleton from '@/components/skeletons/CursoDetailSkeleton';
+import FilterBar from '@/components/filter/FilterBar';
 import { getAllCourses } from '@/services/courseService';
 import { getCollegesWithCourse } from '@/services/fafylService';
 import { Course, College, CourseImp } from '@/types';
-import { IoChevronDown, IoMap, IoOpenOutline, IoTimeOutline, IoCalendarOutline, IoStar, IoStarOutline } from 'react-icons/io5';
+import { IoChevronDown, IoMap, IoOpenOutline, IoTimeOutline, IoCalendarOutline, IoStar, IoStarOutline, IoLocate } from 'react-icons/io5';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/layout/PageTransition';
+import { getCachedLocation, setCachedLocation } from '@/utils/locationCache';
+import { calculateHaversineDistance, formatDistanceCompact } from '@/utils/distance';
 
 const stagger = {
   hidden: { opacity: 0 },
@@ -97,6 +100,30 @@ export default function CursoDetailScreen() {
   const [mapVisible, setMapVisible] = useState(false);
   const [selectedImp, setSelectedImp] = useState<CourseImp | null>(null);
   const scrolledRef = useRef(false);
+  const [maxDistance, setMaxDistance] = useState(0);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lon: number } | null>(null);
+
+  useEffect(() => {
+    const cached = getCachedLocation();
+    if (cached) {
+      setUserLocation(cached);
+      return;
+    }
+
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const loc = {
+          lat: position.coords.latitude,
+          lon: position.coords.longitude,
+        };
+        setUserLocation(loc);
+        setCachedLocation(loc.lat, loc.lon);
+      },
+      () => {}
+    );
+  }, []);
 
   useEffect(() => {
     const courseId = parseInt(id || '0', 10);
@@ -131,6 +158,19 @@ export default function CursoDetailScreen() {
     setSelectedImp(imp);
     setMapVisible(true);
   };
+
+  const distanceOf = (item: { college: College; courseImp: CourseImp }): number | null => {
+    const loc = item.courseImp.locale ?? item.college.locale;
+    if (!loc || !userLocation) return null;
+    return calculateHaversineDistance(userLocation.lat, userLocation.lon, loc.lat, loc.lon);
+  };
+
+  const displayItems = (maxDistance > 0 && userLocation)
+    ? items.filter((item) => {
+        const dist = distanceOf(item);
+        return dist !== null && dist <= maxDistance;
+      })
+    : items;
 
   if (loading) {
     return (
@@ -172,16 +212,32 @@ export default function CursoDetailScreen() {
               Faculdades com {course.name}:
             </motion.h2>
 
-            {items.length === 0 ? (
+            <div className="mb-3">
+              <FilterBar
+                showDistance
+                maxDistance={maxDistance || undefined}
+                onMaxDistanceChange={(v) => setMaxDistance(v)}
+              />
+              {maxDistance > 0 && !userLocation && (
+                <motion.p className="text-sm text-muted-foreground mt-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                  Permita acesso à localização para filtrar por distância
+                </motion.p>
+              )}
+            </div>
+
+            {displayItems.length === 0 ? (
               <motion.p className="text-center text-sm text-muted-foreground mt-10" variants={fadeUp}>
-                Nenhuma faculdade com esse curso
+                {maxDistance > 0
+                  ? 'Nenhuma faculdade dentro da distância selecionada'
+                  : 'Nenhuma faculdade com esse curso'}
               </motion.p>
             ) : (
               <motion.div className="space-y-3 pb-24" variants={fadeUp}>
-                {items.map(({ college, courseImp }, index) => (
+                {displayItems.map(({ college, courseImp }, index) => (
                   <motion.div key={courseImp.id} variants={fadeUp} custom={index}>
                     <CourseImpCard
                       imp={{ ...courseImp, college }}
+                      distance={distanceOf({ college, courseImp })}
                       onViewMap={handleViewMap}
                     />
                   </motion.div>
@@ -213,10 +269,11 @@ export default function CursoDetailScreen() {
 
 interface CourseImpCardProps {
   imp: CourseImp;
+  distance?: number | null;
   onViewMap: (imp: CourseImp) => void;
 }
 
-function CourseImpCard({ imp, onViewMap }: CourseImpCardProps) {
+function CourseImpCard({ imp, distance, onViewMap }: CourseImpCardProps) {
   const [expanded, setExpanded] = useState(false);
   const collegeName = imp.college?.name || 'Faculdade';
   const collegeId = imp.college?.id;
@@ -276,6 +333,12 @@ function CourseImpCard({ imp, onViewMap }: CourseImpCardProps) {
               {feesLabel && (
                 <p className={`text-sm font-medium ${imp.fees === 0 ? 'text-green-600' : 'text-muted-foreground'}`}>
                   {feesLabel}
+                </p>
+              )}
+              {distance !== null && distance !== undefined && (
+                <p className="text-sm text-muted-foreground mt-0.5 flex items-center gap-1">
+                  <IoLocate size={13} className="text-primary shrink-0" />
+                  {formatDistanceCompact(distance)} de distância
                 </p>
               )}
             </div>
