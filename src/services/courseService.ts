@@ -1,16 +1,21 @@
 import { USE_MOCKS } from '@/config/env';
 import { Course, CourseImp, CourseFilters, PageResponse } from '@/types';
 import { request, buildQuery } from './api';
+import { cached } from './cache';
 import { getAllCoursesData, getAllCourseImpsData } from './dataLoader';
+
+const TTL = 5 * 60_000;
 
 export async function getAllCourses(): Promise<Course[]> {
   if (USE_MOCKS) return getAllCoursesData();
-  try {
-    const response: any = await request('/model/course');
-    return response.content || response;
-  } catch {
-    return getAllCoursesData();
-  }
+  return cached('course-all', async () => {
+    try {
+      const response: any = await request('/model/course');
+      return response.content || response;
+    } catch {
+      return getAllCoursesData();
+    }
+  }, TTL);
 }
 
 export async function getCoursesFiltered(filters: CourseFilters): Promise<PageResponse<Course>> {

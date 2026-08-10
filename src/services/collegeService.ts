@@ -1,17 +1,21 @@
 import { USE_MOCKS } from '@/config/env';
 import { College, CourseImp, CollegeFilters, PageResponse } from '@/types';
 import { request, buildQuery } from './api';
-import { getAllCourseImps } from './courseService';
+import { cached } from './cache';
 import { getAllCollegesData, getAllCourseImpsData } from './dataLoader';
+
+const TTL = 5 * 60_000;
 
 export async function getAllColleges(): Promise<College[]> {
   if (USE_MOCKS) return getAllCollegesData();
-  try {
-    const response: any = await request('/college?size=500');
-    return response.content || response;
-  } catch {
-    return getAllCollegesData();
-  }
+  return cached('college-all', async () => {
+    try {
+      const response: any = await request('/college?size=500');
+      return response.content || response;
+    } catch {
+      return getAllCollegesData();
+    }
+  }, TTL);
 }
 
 export async function getCollegesFiltered(filters: CollegeFilters): Promise<PageResponse<College>> {
@@ -58,11 +62,13 @@ export async function getCollegeCourses(id: number): Promise<CourseImp[]> {
     const allImps = getAllCourseImpsData();
     return allImps.filter((imp) => imp.college.id === id);
   }
-  try {
-    const response: any = await request(`/college/${id}/course`);
-    return response.content || response;
-  } catch {
-    const allImps = getAllCourseImpsData();
-    return allImps.filter((imp) => imp.college.id === id);
-  }
+  return cached(`college-courses-${id}`, async () => {
+    try {
+      const response: any = await request(`/college/${id}/course`);
+      return response.content || response;
+    } catch {
+      const allImps = getAllCourseImpsData();
+      return allImps.filter((imp) => imp.college.id === id);
+    }
+  }, TTL);
 }

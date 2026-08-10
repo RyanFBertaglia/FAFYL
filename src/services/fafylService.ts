@@ -2,7 +2,7 @@ import { USE_MOCKS } from '@/config/env';
 import { Fafyl, College, CourseImp } from '@/types';
 import { request } from './api';
 import { getAllCourses } from './courseService';
-import { getAllColleges, getCollegeCourses } from './collegeService';
+import { getAllColleges } from './collegeService';
 
 export async function getRecommendations(discProfile: Record<string, number>): Promise<Fafyl[]> {
   if (USE_MOCKS) return computeMockRecommendations(discProfile);
@@ -38,15 +38,10 @@ async function computeMockRecommendations(discProfile: Record<string, number>): 
 
 export async function getCollegesWithCourse(courseId: number): Promise<{ college: College; courseImp: CourseImp }[]> {
   const colleges = await getAllColleges();
-  const results: { college: College; courseImp: CourseImp }[] = [];
 
-  for (const college of colleges) {
-    const imps = await getCollegeCourses(college.id);
-    const matchingImp = imps.find((imp) => imp.course.id === courseId);
-    if (matchingImp) {
-      results.push({ college, courseImp: matchingImp });
-    }
-  }
-
-  return results;
+  return colleges.flatMap((college) =>
+    college.courses
+      .filter((imp) => imp.course.id === courseId)
+      .map((courseImp) => ({ college, courseImp }))
+  );
 }
