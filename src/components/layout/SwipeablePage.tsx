@@ -40,11 +40,14 @@ export default function SwipeablePage({ children, className }: { children: React
       {children}
       {currentIndex >= 0 && (
         <div className="flex justify-center gap-1.5 pb-2 pt-1 shrink-0">
-          {SWIPE_ORDER.map((_, i) => (
-            <div
+          {SWIPE_ORDER.map((page, i) => (
+            <button
               key={i}
+              type="button"
+              aria-label={`Ir para página ${i + 1}`}
+              onClick={() => navigate(page)}
               className={cn(
-                "rounded-full transition-all duration-300",
+                "p-0 border-none rounded-full transition-all duration-300 cursor-pointer",
                 i === currentIndex
                   ? "w-5 h-1.5 bg-primary"
                   : "w-1.5 h-1.5 bg-muted-foreground/20"
