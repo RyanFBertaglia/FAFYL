@@ -13,6 +13,7 @@ import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/layout/PageTransition';
 import FilterBar from '@/components/filter/FilterBar';
 import Pagination from '@/components/filter/Pagination';
+import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -116,10 +117,11 @@ export default function FaculdadesScreen() {
   );
   const displayTotalPages = maxDistance > 0 ? totalPages : Math.ceil(sourceList.length / ITEMS_PER_PAGE);
   const displayList = maxDistance > 0 ? filtered : sourceList.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+  const listCols = useResponsiveColumns(displayList.length);
 
   const renderCard = (item: College) => (
     <motion.div key={item.id} variants={itemVariants}>
-      <Card className="overflow-hidden border-0 gap-0 pb-0 pt-0">
+      <Card className="overflow-hidden border-0 gap-0 pb-0 pt-0 flex flex-col h-full">
         {resolveImageUrl(item.image) && (
           <img
             src={resolveImageUrl(item.image)}
@@ -127,11 +129,11 @@ export default function FaculdadesScreen() {
             alt={item.name}
           />
         )}
-        <CardContent className="bg-primary py-(--card-spacing)">
+        <CardContent className="bg-primary py-(--card-spacing) flex flex-col">
           <h3 className="text-lg font-bold text-accent mb-2">{item.name}</h3>
           <p className="text-sm text-primary-foreground/80 mb-4 line-clamp-3">{item.description}</p>
             <Button
-              variant="accent" size="lg" className="w-full"
+              variant="accent" size="lg" className="w-full mt-auto"
               onClick={() => {
                 let url = `/busca/${item.id}/faculdade`;
                 if (courseId) url += `?highlightCourseId=${courseId}`;
@@ -206,7 +208,12 @@ export default function FaculdadesScreen() {
             </motion.p>
           ) : (
             <motion.div
-              className="space-y-4 pb-24"
+              className="pb-24"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${listCols}, minmax(0, 1fr))`,
+                gap: 16,
+              }}
               variants={containerVariants}
               initial="hidden"
               animate="visible"

@@ -122,6 +122,7 @@ export default function Corrossel({ onViewCollege }: { onViewCollege?: (id: stri
   }, []);
 
   const REPEAT_COUNT = 10;
+const CARDS_PER_TICK = 0.0028;
   const DATA = items.length > 0 ? Array(REPEAT_COUNT).fill(items).flat() : [];
   const cardWidth = screenWidth * 0.7;
   const itemWidth = cardWidth + CARD_MARGIN * 2;
@@ -138,7 +139,7 @@ export default function Corrossel({ onViewCollege }: { onViewCollege?: (id: stri
 
   useEffect(() => {
     if (isInteracting || items.length === 0) return;
-    const step = 0.8 * (screenWidth / 390);
+    const step = CARDS_PER_TICK * itemWidth;
     const id = setInterval(() => {
       if (scrollRef.current) {
         const next = scrollRef.current.scrollLeft + step;

@@ -2,7 +2,7 @@ import Background from '@/components/layout/background';
 import MapModal from '@/components/MapModal';
 import CursoDetailSkeleton from '@/components/skeletons/CursoDetailSkeleton';
 import FilterBar from '@/components/filter/FilterBar';
-import { getAllCourses } from '@/services/courseService';
+import { getCourseById } from '@/services/courseService';
 import { getCollegesWithCourse } from '@/services/fafylService';
 import { Course, College, CourseImp } from '@/types';
 import { IoChevronDown, IoMap, IoOpenOutline, IoTimeOutline, IoCalendarOutline, IoStar, IoStarOutline, IoLocate } from 'react-icons/io5';
@@ -127,10 +127,9 @@ export default function CursoDetailScreen() {
 
   useEffect(() => {
     const courseId = parseInt(id || '0', 10);
-    Promise.all([getAllCourses(), getCollegesWithCourse(courseId)]).then(
-      ([courses, results]) => {
-        const found = courses.find((c) => c.id === courseId);
-        setCourse(found || null);
+    Promise.all([getCourseById(courseId), getCollegesWithCourse(courseId)]).then(
+      ([found, results]) => {
+        setCourse(found);
         setItems(results);
         setLoading(false);
       }

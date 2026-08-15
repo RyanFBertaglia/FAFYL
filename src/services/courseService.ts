@@ -10,7 +10,7 @@ export async function getAllCourses(): Promise<Course[]> {
   if (USE_MOCKS) return getAllCoursesData();
   return cached('course-all', async () => {
     try {
-      const response: any = await request('/model/course');
+      const response: any = await request('/model/course?size=500');
       return response.content || response;
     } catch {
       return getAllCoursesData();
@@ -43,6 +43,17 @@ export async function getCoursesFiltered(filters: CourseFilters): Promise<PageRe
   } catch {
     return { content: getAllCoursesData(), totalPages: 1, totalElements: getAllCoursesData().length, size: 20, number: 0 };
   }
+}
+
+export async function getCourseById(id: number): Promise<Course | null> {
+  if (USE_MOCKS) return getAllCoursesData().find((c) => c.id === id) ?? null;
+  return cached(`course-${id}`, async () => {
+    try {
+      return await request(`/model/course/${id}`);
+    } catch {
+      return getAllCoursesData().find((c) => c.id === id) ?? null;
+    }
+  }, TTL);
 }
 
 export async function getAllCourseImps(): Promise<CourseImp[]> {

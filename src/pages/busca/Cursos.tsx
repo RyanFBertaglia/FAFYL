@@ -11,6 +11,7 @@ import { Card } from '@/components/ui/card';
 import PageTransition from '@/components/layout/PageTransition';
 import FilterBar from '@/components/filter/FilterBar';
 import Pagination from '@/components/filter/Pagination';
+import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -89,6 +90,7 @@ export default function CursosScreen() {
   );
   const displayTotalPages = category || sortBy !== 'name' ? totalPages : Math.ceil(sourceList.length / ITEMS_PER_PAGE);
   const displayList = category || sortBy !== 'name' ? filtered : sourceList.slice(page * ITEMS_PER_PAGE, (page + 1) * ITEMS_PER_PAGE);
+  const listCols = useResponsiveColumns(displayList.length);
 
   return (
     <Background title="Cursos" showBackButton onBackPress={() => navigate('/busca')}>
@@ -131,7 +133,12 @@ export default function CursosScreen() {
             </motion.p>
           ) : (
             <motion.div
-              className="space-y-3 pb-24"
+              className="pb-24"
+              style={{
+                display: 'grid',
+                gridTemplateColumns: `repeat(${listCols}, minmax(0, 1fr))`,
+                gap: 12,
+              }}
               variants={containerVariants}
               initial="hidden"
               animate="visible"

@@ -16,6 +16,7 @@ import PageTransition from '@/components/layout/PageTransition';
 import { getCachedLocation, setCachedLocation } from '@/utils/locationCache';
 import { calculateHaversineDistance, formatDistanceCompact } from '@/utils/distance';
 import { USE_MOCKS } from '@/config/env';
+import { useResponsiveColumns } from '@/hooks/useResponsiveColumns';
 
 const COURSES_PER_PAGE = 15;
 
@@ -157,6 +158,7 @@ export default function FaculdadeDetailScreen() {
     coursePage * COURSES_PER_PAGE,
     (coursePage + 1) * COURSES_PER_PAGE
   );
+  const listCols = useResponsiveColumns(displayedCourses.length);
 
   const isHighlighted = (courseId: number) => highlightedId === courseId;
 
@@ -259,7 +261,15 @@ export default function FaculdadeDetailScreen() {
                 {courses.length === 0 ? 'Nenhum curso disponível' : 'Nenhum curso nessa área'}
               </motion.p>
             ) : (
-              <motion.div className="space-y-3 pb-24" variants={fadeUp}>
+              <motion.div
+                className="pb-24"
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: `repeat(${listCols}, minmax(0, 1fr))`,
+                  gap: 12,
+                }}
+                variants={fadeUp}
+              >
                 {displayedCourses.map((course) => (
                   <motion.div
                     key={course.id}

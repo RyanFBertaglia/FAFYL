@@ -9,6 +9,7 @@ node_modules/**/node_modules/
 dist/
 web-build/
 expo-env.d.ts
+PLANO.md
 
 # Native
 .kotlin/

@@ -1,6 +1,7 @@
 import { useNavigate } from 'react-router-dom';
 import React from 'react';
 import { motion } from 'framer-motion';
+import { IoSearch } from 'react-icons/io5';
 import Corrossel from '@/components/ui/corrossel';
 import Background from '@/components/layout/background';
 import PageTransition from '@/components/layout/PageTransition';
@@ -26,16 +27,25 @@ export default function Home() {
     <Background
       title="FAFYL"
       headerAction={
-        <button
-          onClick={() => navigate('/profile')}
-          className="w-9 h-9 rounded-full bg-primary-foreground/15 flex items-center justify-center cursor-pointer border-none active:scale-90 hover:bg-primary-foreground/25 transition-all"
-          aria-label="Ver perfil"
-        >
-          <svg width={18} height={18} viewBox="0 0 16 16">
-            <path fill="white" d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-            <path fill="white" fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
-          </svg>
-        </button>
+        <div className="flex items-center gap-1.5">
+          <button
+            onClick={() => navigate('/busca')}
+            className="w-9 h-9 rounded-full bg-primary-foreground/15 flex items-center justify-center cursor-pointer border-none active:scale-90 hover:bg-primary-foreground/25 transition-all"
+            aria-label="Buscar"
+          >
+            <IoSearch size={18} className="text-primary-foreground" />
+          </button>
+          <button
+            onClick={() => navigate('/profile')}
+            className="w-9 h-9 rounded-full bg-primary-foreground/15 flex items-center justify-center cursor-pointer border-none active:scale-90 hover:bg-primary-foreground/25 transition-all"
+            aria-label="Ver perfil"
+          >
+            <svg width={18} height={18} viewBox="0 0 16 16">
+              <path fill="white" d="M11 6a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+              <path fill="white" fillRule="evenodd" d="M0 8a8 8 0 1 1 16 0A8 8 0 0 1 0 8m8-7a7 7 0 0 0-5.468 11.37C3.242 11.226 4.805 10 8 10s4.757 1.225 5.468 2.37A7 7 0 0 0 8 1" />
+            </svg>
+          </button>
+        </div>
       }
     >
       <PageTransition>
@@ -70,6 +80,8 @@ export default function Home() {
               </p>
               <Corrossel onViewCollege={(id) => navigate(`/busca/${id}/faculdade`)} />
             </motion.section>
+
+            <div className="grid grid-cols-1 min-[500px]:grid-cols-2 gap-6 items-start">
 
             {/* QUIZ CTA */}
             <motion.section variants={fadeUp}>
@@ -129,6 +141,8 @@ export default function Home() {
                 </Button>
               </Card>
             </motion.section>
+
+            </div>
 
           </motion.div>
         </SwipeablePage>

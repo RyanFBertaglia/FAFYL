@@ -16,4 +16,5 @@ export const ROUTES = {
   PROFILE_CAPELINHOS: '/profile/capelinhos',
   PROFILE_HISTORICO: '/profile/historico',
   PROFILE_EDITAR: '/profile/editar',
+  PROFILE_EDITAR_FOTO_FACULDADE: '/adicionar',
 } as const;
