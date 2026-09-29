@@ -48,6 +48,7 @@ jest.mock('@/services/historyService', () => ({
   getHistory: jest.fn().mockResolvedValue([
     { id: 1, course: { id: 1, name: 'Engenharia de Software', description: 'Curso de software' }, accessedAt: '2024-01-01T00:00:00Z', profile: { D: 1, I: 0, S: 0, C: 0 } },
   ]),
+  addHistory: jest.fn().mockResolvedValue(undefined),
   formatDate: jest.fn().mockReturnValue('01/01/2024'),
 }));
 

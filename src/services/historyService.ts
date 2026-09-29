@@ -3,16 +3,11 @@ import { API_BASE, request } from './api';
 
 export interface HistoryEntry {
   id: number;
-  user: {
-    id: number;
-    name: string;
-    email: string;
-  };
   course: {
     id: number;
     name: string;
     description: string;
-    discWeights: Record<string, number>;
+    discWeights?: Record<string, number>;
   };
   accessedAt: string;
 }
@@ -23,6 +18,15 @@ export async function getHistory(): Promise<HistoryEntry[]> {
     return await request<HistoryEntry[]>('/auth/history');
   } catch {
     return [];
+  }
+}
+
+export async function addHistory(courseId: number): Promise<void> {
+  if (USE_MOCKS) return;
+  try {
+    await request(`/auth/history?idCourse=${courseId}`, { method: 'POST' });
+  } catch {
+    // best effort: falha de rede/401 não deve quebrar o fluxo do quiz
   }
 }
 

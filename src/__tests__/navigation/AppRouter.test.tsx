@@ -33,6 +33,7 @@ jest.mock('@/services/capelinhoService', () => ({
 
 jest.mock('@/services/historyService', () => ({
   getHistory: jest.fn().mockResolvedValue([]),
+  addHistory: jest.fn().mockResolvedValue(undefined),
   formatDate: jest.fn().mockReturnValue('01/01/2024'),
 }));
 

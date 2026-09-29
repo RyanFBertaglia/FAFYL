@@ -162,7 +162,10 @@ export default function FaculdadesScreen() {
                 Mostrando faculdades com o curso selecionado
               </span>
               <button
-                onClick={() => { window.history.replaceState({}, '', '/busca/faculdades'); setColleges(colleges); setSearch(''); }}
+                onClick={() => {
+                  navigate('/busca/faculdades', { replace: true });
+                  setSearch('');
+                }}
                 className="text-xs text-primary font-bold underline cursor-pointer bg-transparent border-none shrink-0"
               >
                 Limpar

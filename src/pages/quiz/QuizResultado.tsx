@@ -5,6 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Fafyl } from '@/types';
 import { getRecommendations } from '@/services/fafylService';
+import { addHistory } from '@/services/historyService';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import PageTransition from '@/components/layout/PageTransition';
@@ -39,6 +40,7 @@ export default function ResultadoScreen() {
       setResults(data);
       if (data.length > 0) {
         setMaxScore(data[0].score);
+        addHistory(data[0].course.id);
       }
       setLoading(false);
     });
