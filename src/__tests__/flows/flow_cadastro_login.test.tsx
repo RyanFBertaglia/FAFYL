@@ -10,10 +10,15 @@ jest.mock('react-router-dom', () => ({
 
 import RegisterScreen from '@/pages/Register';
 import LoginScreen from '@/pages/Login';
+import { AuthProvider } from '@/context/AuthContext';
+
+function renderScreen(ui: React.ReactElement) {
+  return render(<AuthProvider>{ui}</AuthProvider>);
+}
 
 describe('Fluxo: Cadastro → Login', () => {
   it('cadastro renderiza formulário e navega para login', () => {
-    render(<RegisterScreen />);
+    renderScreen(<RegisterScreen />);
 
     expect(screen.getByText('Crie sua conta')).toBeTruthy();
     expect(screen.getByText('Nome')).toBeTruthy();
@@ -27,7 +32,7 @@ describe('Fluxo: Cadastro → Login', () => {
   });
 
   it('login renderiza formulário', () => {
-    render(<LoginScreen />);
+    renderScreen(<LoginScreen />);
 
     expect(screen.getByText('Entre na sua conta')).toBeTruthy();
     expect(screen.getByText('E-mail')).toBeTruthy();
@@ -36,7 +41,7 @@ describe('Fluxo: Cadastro → Login', () => {
   });
 
   it('login navega para cadastro', () => {
-    render(<LoginScreen />);
+    renderScreen(<LoginScreen />);
 
     fireEvent.click(screen.getByText('Cadastre-se'));
     expect(mockNavigate).toHaveBeenCalledWith('/');

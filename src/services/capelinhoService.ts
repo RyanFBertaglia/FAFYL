@@ -1,6 +1,6 @@
 import { USE_MOCKS } from '@/config/env';
 import { UserDTO } from '@/types';
-import { API_BASE, request } from './api';
+import { request } from './api';
 
 const MOCK_USER: UserDTO = {
   id: 1,
@@ -12,12 +12,7 @@ const MOCK_USER: UserDTO = {
 
 export async function updateCapelinho(capelinhoId: number): Promise<UserDTO> {
   if (USE_MOCKS) return { ...MOCK_USER, capelinho: capelinhoId };
-  const response = await fetch(`${API_BASE}/auth/capelinho/${capelinhoId}`, {
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
-  });
-  if (!response.ok) throw new Error(`HTTP ${response.status}`);
-  return response.json();
+  return request<UserDTO>(`/auth/capelinho/${capelinhoId}`, { method: 'PUT' });
 }
 
 export async function getUserCapelinho(): Promise<number | null> {

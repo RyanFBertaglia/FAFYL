@@ -20,6 +20,7 @@ import Profile from '@/pages/profile/Profile';
 import Capelinhos from '@/pages/profile/ProfileCapelinhos';
 import Historico from '@/pages/profile/ProfileHistorico';
 import Editar from '@/pages/profile/ProfileEditar';
+import { AuthProvider } from '@/context/AuthContext';
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -51,5 +52,9 @@ function AnimatedRoutes() {
 }
 
 export default function App() {
-  return <AnimatedRoutes />;
+  return (
+    <AuthProvider>
+      <AnimatedRoutes />
+    </AuthProvider>
+  );
 }

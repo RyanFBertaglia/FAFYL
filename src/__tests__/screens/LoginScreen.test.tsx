@@ -9,26 +9,35 @@ jest.mock('react-router-dom', () => ({
 }));
 
 import LoginScreen from '@/pages/Login';
+import { AuthProvider } from '@/context/AuthContext';
+
+function renderScreen() {
+  return render(
+    <AuthProvider>
+      <LoginScreen />
+    </AuthProvider>
+  );
+}
 
 describe('LoginScreen', () => {
   it('renderiza descrição "Entre na sua conta"', () => {
-    render(<LoginScreen />);
+    renderScreen();
     expect(screen.getByText('Entre na sua conta')).toBeTruthy();
   });
 
   it('renderiza campos de email e senha', () => {
-    render(<LoginScreen />);
+    renderScreen();
     expect(screen.getByText('E-mail')).toBeTruthy();
     expect(screen.getByText('Senha')).toBeTruthy();
   });
 
   it('renderiza botão "Entrar"', () => {
-    render(<LoginScreen />);
+    renderScreen();
     expect(screen.getByText('Entrar')).toBeTruthy();
   });
 
   it('navega para home ao pressionar "Cadastre-se"', () => {
-    render(<LoginScreen />);
+    renderScreen();
     fireEvent.click(screen.getByText('Cadastre-se'));
     expect(mockNavigate).toHaveBeenCalledWith('/');
   });

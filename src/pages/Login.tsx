@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import Background from '@/components/layout/background';
@@ -6,6 +6,7 @@ import PageTransition from '@/components/layout/PageTransition';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { useAuth } from '@/context/AuthContext';
 
 const stagger = {
   hidden: { opacity: 0 },
@@ -19,6 +20,34 @@ const fadeUp = {
 
 export default function LoginScreen() {
   const navigate = useNavigate();
+  const { token, isLoading, signIn } = useAuth();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (!isLoading && token) {
+      navigate('/home', { replace: true });
+    }
+  }, [isLoading, token, navigate]);
+
+  const handleLogin = async () => {
+    if (!email.trim() || !password) {
+      setError('Informe e-mail e senha.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      await signIn(email.trim().toLowerCase(), password);
+      navigate('/home', { replace: true });
+    } catch {
+      setError('E-mail ou senha inválidos.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <Background>
@@ -45,15 +74,34 @@ export default function LoginScreen() {
               <CardContent className="space-y-4">
                 <motion.div className="space-y-2" variants={fadeUp}>
                   <label className="text-sm font-medium text-foreground">E-mail</label>
-                  <Input type="email" placeholder="seu@email.com" />
+                  <Input
+                    type="email"
+                    placeholder="seu@email.com"
+                    autoComplete="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    disabled={loading}
+                  />
                 </motion.div>
                 <motion.div className="space-y-2" variants={fadeUp}>
                   <label className="text-sm font-medium text-foreground">Senha</label>
-                  <Input type="password" placeholder="Sua senha" />
+                  <Input
+                    type="password"
+                    placeholder="Sua senha"
+                    autoComplete="current-password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
+                  />
                 </motion.div>
+                {error && (
+                  <motion.p className="text-sm text-red-500 text-center" variants={fadeUp}>
+                    {error}
+                  </motion.p>
+                )}
                 <motion.div variants={fadeUp}>
-                  <Button variant="accent" size="lg" className="w-full" onClick={() => navigate('/home', { replace: true })}>
-                    Entrar
+                  <Button variant="accent" size="lg" className="w-full" onClick={handleLogin} disabled={loading}>
+                    {loading ? 'Entrando…' : 'Entrar'}
                   </Button>
                 </motion.div>
                 <motion.div className="text-center" variants={fadeUp}>

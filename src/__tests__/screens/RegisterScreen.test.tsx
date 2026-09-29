@@ -9,15 +9,24 @@ jest.mock('react-router-dom', () => ({
 }));
 
 import RegisterScreen from '@/pages/Register';
+import { AuthProvider } from '@/context/AuthContext';
+
+function renderScreen() {
+  return render(
+    <AuthProvider>
+      <RegisterScreen />
+    </AuthProvider>
+  );
+}
 
 describe('RegisterScreen', () => {
   it('renderiza descrição "Crie sua conta"', () => {
-    render(<RegisterScreen />);
+    renderScreen();
     expect(screen.getByText('Crie sua conta')).toBeTruthy();
   });
 
   it('renderiza campos de formulário', () => {
-    render(<RegisterScreen />);
+    renderScreen();
     expect(screen.getByText('Nome')).toBeTruthy();
     expect(screen.getByText('E-mail')).toBeTruthy();
     expect(screen.getByText('Senha')).toBeTruthy();
@@ -25,12 +34,12 @@ describe('RegisterScreen', () => {
   });
 
   it('renderiza botão "Cadastrar"', () => {
-    render(<RegisterScreen />);
+    renderScreen();
     expect(screen.getByText('Cadastrar')).toBeTruthy();
   });
 
   it('navega para /login ao pressionar "Fazer login"', () => {
-    render(<RegisterScreen />);
+    renderScreen();
     fireEvent.click(screen.getByText('Fazer login'));
     expect(mockNavigate).toHaveBeenCalledWith('/login');
   });

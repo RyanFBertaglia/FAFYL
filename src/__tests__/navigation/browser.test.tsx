@@ -33,6 +33,8 @@ jest.mock('@/services/courseService', () => ({
     { id: 1, name: 'Engenharia de Software', description: 'Curso de software' },
     { id: 2, name: 'Ciência da Computação', description: 'Curso de computação' },
   ]),
+  getCourseById: jest.fn().mockResolvedValue({ id: 1, name: 'Engenharia de Software', description: 'Curso de software' }),
+  getCollegesWithCourse: jest.fn().mockResolvedValue([]),
 }));
 
 jest.mock('@/services/capelinhoService', () => ({
