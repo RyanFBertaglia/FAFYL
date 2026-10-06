@@ -4,6 +4,21 @@ import { MemoryRouter } from 'react-router-dom';
 
 import App from '@/App';
 
+let mockToken: string | null = null;
+jest.mock('@/context/AuthContext', () => {
+  const AuthProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+  const useAuth = () => ({
+    token: mockToken,
+    user: mockToken ? { id: 1, name: 'Teste', email: 'teste@fafyl.dev', locale: null } : null,
+    isLoading: false,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn().mockResolvedValue(undefined),
+    refreshUser: jest.fn(),
+  });
+  return { AuthProvider, useAuth };
+});
+
 jest.mock('@/services/quizService', () => ({
   getQuestions: jest.fn().mockResolvedValue([]),
   MOCK_QUESTIONS: [],
@@ -49,6 +64,7 @@ let consoleErrorSpy: jest.SpyInstance;
 
 beforeEach(() => {
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  mockToken = null;
 });
 
 afterEach(() => {
@@ -135,6 +151,7 @@ describe('AppRouter', () => {
   });
 
   it('renderiza Histórico na rota /profile/historico', async () => {
+    mockToken = 'test-token';
     renderAppAt('/profile/historico');
     await waitFor(() => {
       expect(screen.getByText('Nenhum resultado ainda')).toBeTruthy();

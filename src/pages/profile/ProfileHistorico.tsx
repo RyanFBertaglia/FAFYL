@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { HistoryEntry, getHistory, formatDate } from '@/services/historyService';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import PageTransition from '@/components/layout/PageTransition';
@@ -20,15 +21,20 @@ const itemVariants = {
 
 export default function HistoricoScreen() {
   const navigate = useNavigate();
+  const { token } = useAuth();
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!token) {
+      setLoading(false);
+      return;
+    }
     getHistory().then((data) => {
       setHistory(data);
       setLoading(false);
     });
-  }, []);
+  }, [token]);
 
   const handleViewCourse = (courseId: number) => {
     navigate(`/busca/${courseId}/curso`);
@@ -42,6 +48,29 @@ export default function HistoricoScreen() {
             <span className="text-muted-foreground animate-pulse">
               Carregando histórico...
             </span>
+          </div>
+        </PageTransition>
+      </Background>
+    );
+  }
+
+  if (!token) {
+    return (
+      <Background title="FAFYL" showBackButton>
+        <PageTransition>
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div className="animate-scale-in">
+              <IoClipboardOutline size={48} className="text-muted-foreground/30 mb-4" />
+            </div>
+            <h3 className="text-lg font-bold text-primary mb-2 animate-fade-in">
+              Faça login para ver seu histórico
+            </h3>
+            <p className="text-sm text-muted-foreground mb-6 max-w-xs animate-fade-in">
+              Entre com sua conta para visualizar os resultados dos seus quizzes.
+            </p>
+            <Button variant="accent" onClick={() => navigate('/login')}>
+              Entrar
+            </Button>
           </div>
         </PageTransition>
       </Background>

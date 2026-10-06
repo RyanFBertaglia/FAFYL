@@ -1,9 +1,10 @@
 import Background from '@/components/layout/background';
-import { IoTimeOutline, IoPencil } from 'react-icons/io5';
+import { IoTimeOutline, IoPencil, IoLogOutOutline } from 'react-icons/io5';
 import { useNavigate } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { getCapelinhoImage, getUserCapelinho } from '@/services/capelinhoService';
+import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -21,11 +22,17 @@ const fadeUp = {
 
 export default function Profile() {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [capelinhoId, setCapelinhoId] = useState<number | null>(null);
 
   useEffect(() => {
     getUserCapelinho().then(setCapelinhoId);
   }, []);
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
 
   const avatarImage = getCapelinhoImage(capelinhoId);
 
@@ -59,9 +66,8 @@ export default function Profile() {
           <motion.div className="w-full flex-1" variants={fadeUp}>
             <Card className="rounded-t-3xl h-full">
               <CardContent className="p-6 space-y-4">
-                <Input placeholder="User" className="h-12" />
-                <Input placeholder="Nome" className="h-12" />
-                <Input placeholder="E-mail" className="h-12" type="email" />
+                <Input value={user?.name ?? ''} readOnly placeholder="Nome" className="h-12" />
+                <Input value={user?.email ?? ''} readOnly placeholder="E-mail" className="h-12" type="email" />
                 <Input placeholder="CEP" className="h-12" type="text" inputMode="numeric" maxLength={8} />
 
                   <Button
@@ -70,6 +76,14 @@ export default function Profile() {
                   >
                     <IoTimeOutline size={18} />
                     Histórico de resultados
+                  </Button>
+
+                  <Button
+                    variant="destructive" size="lg" className="w-full gap-2"
+                    onClick={handleSignOut}
+                  >
+                    <IoLogOutOutline size={18} />
+                    Sair da conta
                   </Button>
               </CardContent>
             </Card>

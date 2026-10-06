@@ -5,6 +5,21 @@ import { MemoryRouter } from 'react-router-dom';
 import App from '@/App';
 import { MOCK_QUESTIONS, computeDiscProfile } from '@/services/quizService';
 
+let mockToken: string | null = null;
+jest.mock('@/context/AuthContext', () => {
+  const AuthProvider = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+  const useAuth = () => ({
+    token: mockToken,
+    user: mockToken ? { id: 1, name: 'Teste', email: 'teste@fafyl.dev', locale: null } : null,
+    isLoading: false,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn().mockResolvedValue(undefined),
+    refreshUser: jest.fn(),
+  });
+  return { AuthProvider, useAuth };
+});
+
 jest.mock('@/services/quizService', () => {
   const actual = jest.requireActual('@/services/quizService');
   return {
@@ -72,6 +87,7 @@ let consoleErrorSpy: jest.SpyInstance;
 
 beforeEach(() => {
   consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
+  mockToken = null;
 });
 
 afterEach(() => {
@@ -156,6 +172,7 @@ describe('Browser: navegação completa entre páginas', () => {
   });
 
   it('navega do Profile para o histórico', async () => {
+    mockToken = 'test-token';
     renderAppAt('/profile');
     await screen.findByText('Meu Perfil');
     await act(() => Promise.resolve());

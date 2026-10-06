@@ -8,6 +8,19 @@ jest.mock('react-router-dom', () => ({
   useSearchParams: () => [new URLSearchParams(), jest.fn()],
 }));
 
+jest.mock('@/context/AuthContext', () => ({
+  AuthProvider: ({ children }: any) => <>{children}</>,
+  useAuth: () => ({
+    token: 'test-token',
+    user: { id: 1, name: 'Teste', email: 'teste@fafyl.dev', locale: null },
+    isLoading: false,
+    signIn: jest.fn(),
+    signUp: jest.fn(),
+    signOut: jest.fn().mockResolvedValue(undefined),
+    refreshUser: jest.fn(),
+  }),
+}));
+
 import HistoricoScreen from '@/pages/profile/ProfileHistorico';
 
 jest.mock('@/services/historyService', () => ({
